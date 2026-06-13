@@ -13,6 +13,8 @@ public class ChurchResponse {
     private Long id;
     private String name;
     private String address;
+    private String telNumber;
+    private String emailAddress;
     private ChurchDTO parentChurch;
     private List<PastorDTO> pastors;
 }

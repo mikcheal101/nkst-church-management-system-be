@@ -18,5 +18,9 @@ public class ChurchRequest {
     @NotBlank(message = "Address is required!")
     private String address;
 
+    private String emailAddress;
+
+    private String telNumber;
+
     private Long parentChurchId;
 }

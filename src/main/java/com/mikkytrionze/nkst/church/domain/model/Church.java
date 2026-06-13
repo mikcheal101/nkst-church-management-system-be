@@ -25,7 +25,12 @@ public class Church extends Auditable {
     @Column(unique = true, nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private String address;
+
+    private String telNumber;
+
+    private String emailAddress;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "church_id")

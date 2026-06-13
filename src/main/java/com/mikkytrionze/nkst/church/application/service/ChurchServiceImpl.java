@@ -15,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Slf4j
 @Service
 @Transactional
@@ -49,7 +51,7 @@ public class ChurchServiceImpl implements ChurchService {
         Church parentChurch = churchRequest.getParentChurchId() == null ? null : churchRepository.findById(churchRequest.getParentChurchId()).orElse(null);
 
         Church church = Church.builder()
-                .name(churchRequest.getName())
+                .name(churchRequest.getName().toUpperCase())
                 .address(churchRequest.getAddress())
                 .parentChurch(parentChurch)
                 .build();
@@ -71,7 +73,15 @@ public class ChurchServiceImpl implements ChurchService {
                     String.format("A church with the name: '%s' already exists", churchRequest.getName()));
         }
 
-        existingChurch.setName(churchRequest.getName());
+        // get the new parent church
+        boolean hasParentChurch = churchRequest.getParentChurchId() != null;
+        boolean requestingParentChurchChange = churchRequest.getParentChurchId() != existingChurch.getParentChurch().getId();
+        if (hasParentChurch && requestingParentChurchChange) {
+            Church parentChurch = churchRepository.findById(churchRequest.getParentChurchId()).orElseGet(null);
+            existingChurch.setParentChurch(parentChurch);
+        }
+
+        existingChurch.setName(churchRequest.getName().toUpperCase());
         existingChurch.setAddress(churchRequest.getAddress());
 
         Church updatedChurch = churchRepository.save(existingChurch);

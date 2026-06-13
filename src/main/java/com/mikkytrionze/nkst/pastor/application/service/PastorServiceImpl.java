@@ -100,6 +100,7 @@ public class PastorServiceImpl implements PastorService {
             throw new IllegalArgumentException("Id is required!");
         }
 
-        return pastorRepository.findById(id).orElse(null);
+        return pastorRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Pastor not found with id: " + id));
     }
 }
