@@ -101,7 +101,7 @@ public class ChurchServiceImpl implements ChurchService {
     }
 
     @Override
-    @Cacheable(value = "churches_page", key = "#pagable.pageNumber + '-' + #pageable.pageSize")
+    @Cacheable(value = "churches_page", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<ChurchResponse> getChurches(Pageable pageable) {
         log.info("Fetching all the churches with pagination: {}", pageable);
 

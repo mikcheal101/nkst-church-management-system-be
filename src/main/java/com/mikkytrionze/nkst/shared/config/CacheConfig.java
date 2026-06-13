@@ -5,6 +5,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -14,38 +19,45 @@ import java.util.Map;
 public class CacheConfig {
 
     @Bean
-    public RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+    public RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory, ObjectMapper objectMapper) {
+
         Map<String, RedisCacheConfiguration> cacheConfigurationMap = new HashMap<>();
+
+        GenericJacksonJsonRedisSerializer jsonSerializer = new GenericJacksonJsonRedisSerializer(objectMapper);
+
+        RedisCacheConfiguration baseConfiguration = RedisCacheConfiguration
+                .defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(10))
+                .serializeKeysWith(RedisSerializationContext
+                        .SerializationPair
+                        .fromSerializer(new StringRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext
+                        .SerializationPair
+                        .fromSerializer(jsonSerializer));
 
         cacheConfigurationMap.put(
                 "churches",
-                RedisCacheConfiguration
-                        .defaultCacheConfig()
+                baseConfiguration
                         .entryTtl(Duration.ofHours(10)));
 
         cacheConfigurationMap.put(
                 "pastors",
-                RedisCacheConfiguration
-                        .defaultCacheConfig()
+                baseConfiguration
                         .entryTtl(Duration.ofHours(1)));
 
         cacheConfigurationMap.put(
                 "pastors_page",
-                RedisCacheConfiguration
-                        .defaultCacheConfig()
+                baseConfiguration
                         .entryTtl(Duration.ofHours(1)));
 
         cacheConfigurationMap.put(
                 "churches_page",
-                RedisCacheConfiguration
-                        .defaultCacheConfig()
+                baseConfiguration
                         .entryTtl(Duration.ofHours(10)));
 
         return RedisCacheManager
                 .builder(redisConnectionFactory)
-                .cacheDefaults(RedisCacheConfiguration
-                        .defaultCacheConfig()
-                        .entryTtl(Duration.ofMinutes(10)))
+                .cacheDefaults(baseConfiguration)
                 .withInitialCacheConfigurations(cacheConfigurationMap)
                 .build();
     }
