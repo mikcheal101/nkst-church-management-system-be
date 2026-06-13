@@ -247,6 +247,132 @@ class ChurchServiceImplTest {
     }
 
     @Test
+    void shouldUpdateChurchWithNewParent() {
+        Long churchId = 1L;
+        Long newParentId = 20L;
+        Church parent = Church.builder().id(newParentId).name("New Parent").build();
+        ChurchRequest request = ChurchRequest.builder()
+                .name("Updated Church")
+                .address("321 New St")
+                .parentChurchId(newParentId)
+                .build();
+
+        Church existingParent = Church.builder().id(10L).name("Old Parent").build();
+        Church existingChurch = Church.builder()
+                .id(churchId)
+                .name("Old Church")
+                .address("Old Address")
+                .parentChurch(existingParent)
+                .build();
+
+        Church updatedChurch = Church.builder()
+                .id(churchId)
+                .name("Updated Church")
+                .address("321 New St")
+                .parentChurch(parent)
+                .build();
+
+        ChurchResponse response = ChurchResponse.builder()
+                .id(churchId)
+                .name("Updated Church")
+                .address("321 New St")
+                .build();
+
+        when(churchRepository.findById(churchId)).thenReturn(Optional.of(existingChurch));
+        when(churchRepository.findById(newParentId)).thenReturn(Optional.of(parent));
+        when(churchRepository.existsByName("Updated Church")).thenReturn(false);
+        when(churchRepository.save(any(Church.class))).thenReturn(updatedChurch);
+        when(churchMapper.toResponse(updatedChurch)).thenReturn(response);
+
+        ChurchResponse result = churchService.updateChurch(churchId, request);
+
+        assertNotNull(result);
+        assertEquals("Updated Church", result.getName());
+    }
+
+    @Test
+    void shouldUpdateChurchKeepingSameParent() {
+        Long churchId = 1L;
+        Long parentId = 10L;
+        Church parent = Church.builder().id(parentId).name("Parent").build();
+        ChurchRequest request = ChurchRequest.builder()
+                .name("Updated Church")
+                .address("321 New St")
+                .parentChurchId(parentId)
+                .build();
+
+        Church existingChurch = Church.builder()
+                .id(churchId)
+                .name("Old Church")
+                .address("Old Address")
+                .parentChurch(parent)
+                .build();
+
+        Church updatedChurch = Church.builder()
+                .id(churchId)
+                .name("Updated Church")
+                .address("321 New St")
+                .parentChurch(parent)
+                .build();
+
+        ChurchResponse response = ChurchResponse.builder()
+                .id(churchId)
+                .name("Updated Church")
+                .address("321 New St")
+                .build();
+
+        when(churchRepository.findById(churchId)).thenReturn(Optional.of(existingChurch));
+        when(churchRepository.existsByName("Updated Church")).thenReturn(false);
+        when(churchRepository.save(any(Church.class))).thenReturn(updatedChurch);
+        when(churchMapper.toResponse(updatedChurch)).thenReturn(response);
+
+        ChurchResponse result = churchService.updateChurch(churchId, request);
+
+        assertNotNull(result);
+        assertEquals("Updated Church", result.getName());
+    }
+
+    @Test
+    void shouldUpdateChurchClearingParent() {
+        Long churchId = 1L;
+        Church parent = Church.builder().id(10L).name("Parent").build();
+        ChurchRequest request = ChurchRequest.builder()
+                .name("Updated Church")
+                .address("321 New St")
+                .build();
+
+        Church existingChurch = Church.builder()
+                .id(churchId)
+                .name("Old Church")
+                .address("Old Address")
+                .parentChurch(parent)
+                .build();
+
+        Church updatedChurch = Church.builder()
+                .id(churchId)
+                .name("Updated Church")
+                .address("321 New St")
+                .parentChurch(parent)
+                .build();
+
+        ChurchResponse response = ChurchResponse.builder()
+                .id(churchId)
+                .name("Updated Church")
+                .address("321 New St")
+                .build();
+
+        when(churchRepository.findById(churchId)).thenReturn(Optional.of(existingChurch));
+        when(churchRepository.existsByName("Updated Church")).thenReturn(false);
+        when(churchRepository.save(any(Church.class))).thenReturn(updatedChurch);
+        when(churchMapper.toResponse(updatedChurch)).thenReturn(response);
+
+        ChurchResponse result = churchService.updateChurch(churchId, request);
+
+        assertNotNull(result);
+        assertEquals("Updated Church", result.getName());
+    }
+
+    @Test
     void shouldSoftDeleteChurch() {
         Long churchId = 1L;
         Church church = Church.builder().id(churchId).name("To Delete").build();

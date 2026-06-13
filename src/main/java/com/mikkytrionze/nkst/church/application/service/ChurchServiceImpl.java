@@ -86,10 +86,10 @@ public class ChurchServiceImpl implements ChurchService {
         }
 
         // get the new parent church
-        boolean hasParentChurch = churchRequest.getParentChurchId() != null;
-        boolean requestingParentChurchChange = churchRequest.getParentChurchId() != existingChurch.getParentChurch().getId();
-        if (hasParentChurch && requestingParentChurchChange) {
-            Church parentChurch = churchRepository.findById(churchRequest.getParentChurchId()).orElseGet(null);
+        Long existingParentId = existingChurch.getParentChurch() != null ? existingChurch.getParentChurch().getId() : null;
+        boolean requestingParentChurchChange = !Objects.equals(churchRequest.getParentChurchId(), existingParentId);
+        if (churchRequest.getParentChurchId() != null && requestingParentChurchChange) {
+            Church parentChurch = churchRepository.findById(churchRequest.getParentChurchId()).orElse(null);
             existingChurch.setParentChurch(parentChurch);
         }
 
