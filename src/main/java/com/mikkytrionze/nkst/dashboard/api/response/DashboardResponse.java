@@ -1,4 +1,4 @@
-package com.mikkytrionze.nkst.application.dto.response;
+package com.mikkytrionze.nkst.dashboard.api.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

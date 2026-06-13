@@ -1,7 +1,7 @@
-package com.mikkytrionze.nkst.controllers;
+package com.mikkytrionze.nkst.dashboard.api;
 
-import com.mikkytrionze.nkst.application.dto.response.DashboardResponse;
-import com.mikkytrionze.nkst.services.DashboardService;
+import com.mikkytrionze.nkst.dashboard.api.response.DashboardResponse;
+import com.mikkytrionze.nkst.dashboard.domain.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
