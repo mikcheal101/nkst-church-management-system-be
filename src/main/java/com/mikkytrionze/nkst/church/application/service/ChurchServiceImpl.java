@@ -10,6 +10,10 @@ import com.mikkytrionze.nkst.church.domain.service.ChurchService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +31,7 @@ public class ChurchServiceImpl implements ChurchService {
     private final ChurchRepository churchRepository;
 
     @Override
+    @CacheEvict(value = {"churches", "churches_page"}, key = "#id", beforeInvocation = true, allEntries = true)
     public void deleteChurch(Long id) throws ResourceNotFoundException {
         log.info("Deleting church with id: {}", id);
 
@@ -38,6 +43,7 @@ public class ChurchServiceImpl implements ChurchService {
     }
 
     @Override
+    @Cacheable(value = "churches", key = "#id")
     public ChurchResponse getChurch(Long id) {
         log.info("Get Church with id: {}", id);
         Church church = getChurchById(id);
@@ -45,6 +51,7 @@ public class ChurchServiceImpl implements ChurchService {
     }
 
     @Override
+    @CacheEvict(value = "churches_page", allEntries = true)
     public ChurchResponse createChurch(ChurchRequest churchRequest) {
         log.info("Creating a church entity with name: {}", churchRequest.getName());
 
@@ -60,6 +67,11 @@ public class ChurchServiceImpl implements ChurchService {
     }
 
     @Override
+    @Transactional
+    @Caching(
+            put = @CachePut(value = "churches", key = "#id"),
+            evict = @CacheEvict(value = "churches_page", allEntries = true)
+    )
     public ChurchResponse updateChurch(Long id, ChurchRequest churchRequest) throws DataIntegrityViolationException {
         log.info("Updating a church with id: {}", id);
 
@@ -89,6 +101,7 @@ public class ChurchServiceImpl implements ChurchService {
     }
 
     @Override
+    @Cacheable(value = "churches_page", key = "#pagable.pageNumber + '-' + #pageable.pageSize")
     public Page<ChurchResponse> getChurches(Pageable pageable) {
         log.info("Fetching all the churches with pagination: {}", pageable);
 
