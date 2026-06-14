@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,6 @@ public class PastorServiceImpl implements PastorService {
     private final ChurchService churchService;
 
     @Override
-    @Cacheable(value = "pastors_page", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<PastorResponse> getPastors(Pageable pageable) {
         log.info("Loading pastors with pageable: {}", pageable);
 
@@ -49,7 +47,6 @@ public class PastorServiceImpl implements PastorService {
     }
 
     @Override
-    @CacheEvict(value = "pastors_page", allEntries = true)
     public PastorResponse createPastor(PastorRequest pastorRequest) {
         log.info("Creating a pastor with name: {} {}", pastorRequest.getFirstName(), pastorRequest.getLastName());
 
@@ -70,10 +67,7 @@ public class PastorServiceImpl implements PastorService {
     }
 
     @Override
-    @Caching(
-            put = @CachePut(value = "pastors", key = "#id"),
-            evict = @CacheEvict(value = "pastors_page", allEntries = true)
-    )
+    @CachePut(value = "pastors", key = "#id")
     public PastorResponse updatePastor(Long id, PastorRequest pastorRequest) throws IllegalArgumentException {
         log.info("Updating a pastor entity with id: {}", id);
 
@@ -96,7 +90,7 @@ public class PastorServiceImpl implements PastorService {
     }
 
     @Override
-    @CacheEvict(value = {"pastors", "pastors_page"}, allEntries = true, beforeInvocation = true, key = "#id")
+    @CacheEvict(value = "pastors", allEntries = true, beforeInvocation = true)
     public void deletePastorById(Long id) throws IllegalArgumentException {
         log.info("Deleting a pastor entity with id: {}", id);
 

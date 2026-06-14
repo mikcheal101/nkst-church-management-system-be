@@ -9,7 +9,6 @@ import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializ
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.json.JsonMapper;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -23,7 +22,11 @@ public class CacheConfig {
 
         Map<String, RedisCacheConfiguration> cacheConfigurationMap = new HashMap<>();
 
-        GenericJacksonJsonRedisSerializer jsonSerializer = new GenericJacksonJsonRedisSerializer(objectMapper);
+        GenericJacksonJsonRedisSerializer jsonSerializer = GenericJacksonJsonRedisSerializer
+                .builder(() -> objectMapper.rebuild())
+                .enableSpringCacheNullValueSupport()
+                .enableUnsafeDefaultTyping()
+                .build();
 
         RedisCacheConfiguration baseConfiguration = RedisCacheConfiguration
                 .defaultCacheConfig()
@@ -44,16 +47,6 @@ public class CacheConfig {
                 "pastors",
                 baseConfiguration
                         .entryTtl(Duration.ofHours(1)));
-
-        cacheConfigurationMap.put(
-                "pastors_page",
-                baseConfiguration
-                        .entryTtl(Duration.ofHours(1)));
-
-        cacheConfigurationMap.put(
-                "churches_page",
-                baseConfiguration
-                        .entryTtl(Duration.ofHours(10)));
 
         return RedisCacheManager
                 .builder(redisConnectionFactory)
