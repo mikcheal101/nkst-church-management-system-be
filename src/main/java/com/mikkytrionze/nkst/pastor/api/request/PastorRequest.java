@@ -26,5 +26,5 @@ public class PastorRequest {
 
     private Long churchId;
 
-    private String pastorRole;
+    private Long pastorRoleId;
 }

@@ -9,11 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class PastorDTO {
+public class PastorRoleDTO {
     private Long id;
-    private String lastName;
-    private String middleName;
-    private String firstName;
-    private String emailAddress;
-    private PastorRoleDTO pastorRoleDTO;
+    private String name;
 }

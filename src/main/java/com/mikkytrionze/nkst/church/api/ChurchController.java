@@ -24,7 +24,7 @@ public class ChurchController {
 
     @GetMapping
     public ResponseEntity<Page<ChurchResponse>> getChurches(
-            @PageableDefault(page = Constants.INIT_PAGE, size = Constants.PAGE_SIZE) Pageable pageable) {
+            @PageableDefault(size = Constants.PAGE_SIZE) Pageable pageable) {
         Page<ChurchResponse> churches = this.churchService.getChurches(pageable);
         return ResponseEntity.ok().body(churches);
     }

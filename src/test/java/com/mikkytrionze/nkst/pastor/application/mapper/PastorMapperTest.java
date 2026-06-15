@@ -6,8 +6,9 @@ import com.mikkytrionze.nkst.church.application.dto.ChurchDTO;
 import com.mikkytrionze.nkst.church.domain.model.Church;
 import com.mikkytrionze.nkst.pastor.api.response.PastorResponse;
 import com.mikkytrionze.nkst.pastor.application.dto.PastorDTO;
+import com.mikkytrionze.nkst.pastor.application.dto.PastorRoleDTO;
 import com.mikkytrionze.nkst.pastor.domain.model.Pastor;
-import com.mikkytrionze.nkst.pastor.domain.model.enums.PastorRole;
+import com.mikkytrionze.nkst.pastor.domain.model.PastorRole;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
@@ -18,13 +19,14 @@ class PastorMapperTest {
 
     @Test
     void shouldMapPastorToDTO() {
+        PastorRole pastorRole = PastorRole.builder().name("Lead Pastor").build();
         Pastor pastor = Pastor.builder()
                 .id(1L)
                 .firstName("John")
                 .lastName("Doe")
                 .middleName("M")
                 .emailAddress("john@test.com")
-                .pastorRole(PastorRole.LEAD)
+                .pastorRole(pastorRole)
                 .build();
 
         PastorDTO dto = mapper.toDTO(pastor);
@@ -49,7 +51,7 @@ class PastorMapperTest {
 
         PastorDTO dto = mapper.toDTO(pastor);
         assertNotNull(dto);
-        assertNull(dto.getPastorRole());
+        assertNull(dto.getPastorRoleDTO());
     }
 
     @Test
@@ -59,12 +61,13 @@ class PastorMapperTest {
                 .name("Main Church")
                 .build();
 
+        PastorRole pastorRole = PastorRole.builder().name("Lead Pastor").build();
         Pastor pastor = Pastor.builder()
                 .id(1L)
                 .firstName("John")
                 .lastName("Doe")
                 .emailAddress("john@test.com")
-                .pastorRole(PastorRole.LEAD)
+                .pastorRole(pastorRole)
                 .church(church)
                 .build();
 
@@ -99,13 +102,15 @@ class PastorMapperTest {
 
     @Test
     void shouldMapPastorToResponseWithChurchAndPastors() {
+        PastorRole childRole = PastorRole.builder().name("Associate Pastor").build();
         Pastor childPastor = new Pastor();
         childPastor.setId(2L);
         childPastor.setFirstName("Jane");
         childPastor.setLastName("Smith");
         childPastor.setTel("456");
-        childPastor.setPastorRole(PastorRole.ASSOCIATE);
+        childPastor.setPastorRole(childRole);
 
+        PastorRole leadRole = PastorRole.builder().name("Lead Pastor").build();
         Church church = Church.builder()
                 .id(1L)
                 .name("Main Church")
@@ -116,7 +121,7 @@ class PastorMapperTest {
                 .id(1L)
                 .firstName("John")
                 .lastName("Doe")
-                .pastorRole(PastorRole.LEAD)
+                .pastorRole(leadRole)
                 .church(church)
                 .build();
 
@@ -133,11 +138,12 @@ class PastorMapperTest {
         church.setName("Main Church");
         church.setPastors(null);
 
+        PastorRole leadRole = PastorRole.builder().name("Lead Pastor").build();
         Pastor pastor = Pastor.builder()
                 .id(1L)
                 .firstName("John")
                 .lastName("Doe")
-                .pastorRole(PastorRole.LEAD)
+                .pastorRole(leadRole)
                 .church(church)
                 .build();
 
@@ -152,7 +158,7 @@ class PastorMapperTest {
                 .id(1L)
                 .firstName("John")
                 .lastName("Doe")
-                .pastorRole("LEAD")
+                .pastorRoleDTO(PastorRoleDTO.builder().name("Lead Pastor").build())
                 .build();
 
         Pastor pastor = mapper.toEntity(dto);
@@ -161,7 +167,7 @@ class PastorMapperTest {
         assertNull(pastor.getId());
         assertEquals("John", pastor.getFirstName());
         assertEquals("Doe", pastor.getLastName());
-        assertEquals(PastorRole.LEAD, pastor.getPastorRole());
+        assertNull(pastor.getPastorRole());
     }
 
     @Test
@@ -172,37 +178,13 @@ class PastorMapperTest {
     }
 
     @Test
-    void shouldHandlePastorRoleWithDefault() {
-        Pastor pastor = Pastor.builder()
-                .id(1L)
-                .firstName("John")
-                .lastName("Doe")
-                .build();
-
-        PastorDTO dto = mapper.toDTO(pastor);
-        assertEquals("ASSOCIATE", dto.getPastorRole());
-
-        PastorResponse response = mapper.toResponse(pastor);
-        assertEquals("ASSOCIATE", response.getPastorRole());
-
-        PastorDTO dtoWithExplicitRole = PastorDTO.builder()
-                .id(1L)
-                .firstName("John")
-                .lastName("Doe")
-                .pastorRole("LEAD")
-                .build();
-
-        Pastor entity = mapper.toEntity(dtoWithExplicitRole);
-        assertEquals(PastorRole.LEAD, entity.getPastorRole());
-    }
-
-    @Test
     void shouldHandleNullChurchInPastor() {
+        PastorRole leadRole = PastorRole.builder().name("Lead Pastor").build();
         Pastor pastor = Pastor.builder()
                 .id(1L)
                 .firstName("John")
                 .lastName("Doe")
-                .pastorRole(PastorRole.LEAD)
+                .pastorRole(leadRole)
                 .build();
 
         PastorResponse response = mapper.toResponse(pastor);

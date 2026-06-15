@@ -6,8 +6,9 @@ import com.mikkytrionze.nkst.church.application.dto.ChurchDTO;
 import com.mikkytrionze.nkst.church.api.response.ChurchResponse;
 import com.mikkytrionze.nkst.church.domain.model.Church;
 import com.mikkytrionze.nkst.pastor.application.dto.PastorDTO;
+import com.mikkytrionze.nkst.pastor.application.dto.PastorRoleDTO;
 import com.mikkytrionze.nkst.pastor.domain.model.Pastor;
-import com.mikkytrionze.nkst.pastor.domain.model.enums.PastorRole;
+import com.mikkytrionze.nkst.pastor.domain.model.PastorRole;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
@@ -78,11 +79,12 @@ class ChurchMapperTest {
                 .name("Parent Church")
                 .build();
 
+        PastorRole pastorRole = PastorRole.builder().name("Lead Pastor").build();
         Pastor pastor = Pastor.builder()
                 .id(1L)
                 .firstName("John")
                 .lastName("Doe")
-                .pastorRole(PastorRole.LEAD)
+                .pastorRole(pastorRole)
                 .build();
 
         Church church = Church.builder()
@@ -112,7 +114,7 @@ class ChurchMapperTest {
                 .id(1L)
                 .firstName("John")
                 .lastName("Doe")
-                .pastorRole("LEAD")
+                .pastorRoleDTO(PastorRoleDTO.builder().name("Lead Pastor").build())
                 .build();
 
         ChurchDTO parentDTO = ChurchDTO.builder()
@@ -169,7 +171,7 @@ class ChurchMapperTest {
         ChurchDTO dto = mapper.toDTO(church);
         assertNotNull(dto.getPastors());
         assertEquals(1, dto.getPastors().size());
-        assertNull(dto.getPastors().getFirst().getPastorRole());
+        assertNull(dto.getPastors().getFirst().getPastorRoleDTO());
     }
 
     @Test
@@ -189,7 +191,7 @@ class ChurchMapperTest {
         Church church = mapper.toEntity(churchDTO);
         assertNotNull(church);
         assertFalse(church.getPastors().isEmpty());
-        assertEquals(PastorRole.ASSOCIATE, church.getPastors().iterator().next().getPastorRole());
+        assertNull(church.getPastors().iterator().next().getPastorRole());
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.mikkytrionze.nkst.pastor.api.response;
 
 import com.mikkytrionze.nkst.church.application.dto.ChurchDTO;
+import com.mikkytrionze.nkst.pastor.application.dto.PastorRoleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +17,6 @@ public class PastorResponse {
     private String middleName;
     private String firstName;
     private String emailAddress;
-    private String pastorRole;
+    private PastorRoleDTO pastorRole;
     private ChurchDTO church;
 }

@@ -3,7 +3,7 @@ package com.mikkytrionze.nkst.church.domain.model;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.mikkytrionze.nkst.pastor.domain.model.Pastor;
-import com.mikkytrionze.nkst.pastor.domain.model.enums.PastorRole;
+import com.mikkytrionze.nkst.pastor.domain.model.PastorRole;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
@@ -31,11 +31,13 @@ class ChurchTest {
                 .name("Main Church")
                 .build();
 
+        PastorRole pastorRole = PastorRole.builder().name("Lead Pastor").build();
+
         Pastor pastor = Pastor.builder()
                 .firstName("John")
                 .lastName("Doe")
                 .tel("1234567890")
-                .pastorRole(PastorRole.LEAD)
+                .pastorRole(pastorRole)
                 .build();
 
         church.addPastor(pastor);

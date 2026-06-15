@@ -23,7 +23,7 @@ public class PastorController {
 
     @GetMapping
     public ResponseEntity<Page<PastorResponse>> getPastors(
-            @PageableDefault(page = Constants.INIT_PAGE, size = Constants.PAGE_SIZE) Pageable pageable) {
+            @PageableDefault(size = Constants.PAGE_SIZE) Pageable pageable) {
         Page<PastorResponse> pastors = pastorService.getPastors(pageable);
         return ResponseEntity.ok(pastors);
     }

@@ -1,7 +1,6 @@
 package com.mikkytrionze.nkst.pastor.domain.model;
 
 import com.mikkytrionze.nkst.shared.domain.Auditable;
-import com.mikkytrionze.nkst.pastor.domain.model.enums.PastorRole;
 import com.mikkytrionze.nkst.church.domain.model.Church;
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,15 +30,14 @@ public class Pastor extends Auditable {
 
     private String middleName;
 
-    @Column(unique = true, nullable = true)
+    @Column(unique = true)
     private String emailAddress;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "church_id", nullable = false)
+    @JoinColumn(name = "church_id")
     private Church church;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    @Builder.Default
-    private PastorRole pastorRole = PastorRole.ASSOCIATE;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pastor_role_id", nullable = false)
+    private PastorRole pastorRole;
 }

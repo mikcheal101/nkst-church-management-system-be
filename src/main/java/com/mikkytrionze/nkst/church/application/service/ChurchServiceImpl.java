@@ -109,7 +109,11 @@ public class ChurchServiceImpl implements ChurchService {
         return churchRepository.findById(id).orElse(null);
     }
 
-    private Church getChurchById(Long id) {
+    private Church getChurchById(Long id) throws IllegalArgumentException {
+        if (id == null) {
+            throw new IllegalArgumentException("Church Id is required!");
+        }
+
         return churchRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(Church.class.getName(), id));
     }

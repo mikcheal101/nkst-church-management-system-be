@@ -5,9 +5,10 @@ import com.mikkytrionze.nkst.pastor.application.mapper.PastorMapper;
 import com.mikkytrionze.nkst.pastor.api.request.PastorRequest;
 import com.mikkytrionze.nkst.church.domain.model.Church;
 import com.mikkytrionze.nkst.pastor.domain.model.Pastor;
-import com.mikkytrionze.nkst.pastor.domain.model.enums.PastorRole;
+import com.mikkytrionze.nkst.pastor.domain.model.PastorRole;
 import com.mikkytrionze.nkst.pastor.domain.repository.PastorRepository;
 import com.mikkytrionze.nkst.church.domain.service.ChurchService;
+import com.mikkytrionze.nkst.pastor.domain.service.PastorRoleService;
 import com.mikkytrionze.nkst.pastor.domain.service.PastorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ public class PastorServiceImpl implements PastorService {
     private final PastorRepository pastorRepository;
     private final PastorMapper pastorMapper;
     private final ChurchService churchService;
+    private final PastorRoleService pastorRoleService;
 
     @Override
     public Page<PastorResponse> getPastors(Pageable pageable) {
@@ -51,14 +53,22 @@ public class PastorServiceImpl implements PastorService {
         log.info("Creating a pastor with name: {} {}", pastorRequest.getFirstName(), pastorRequest.getLastName());
 
         // get the church
-        Church church = churchService.findChurchById(pastorRequest.getChurchId());
+        Church church = null;
+        if (pastorRequest.getChurchId() != null) {
+            church = churchService.findChurchById(pastorRequest.getChurchId());
+        }
+
+        PastorRole pastorRole = null;
+        if (pastorRequest.getPastorRoleId() != null) {
+            pastorRole = pastorRoleService.findPastorRole(pastorRequest.getPastorRoleId());
+        }
 
         Pastor pastor = Pastor.builder()
                 .firstName(pastorRequest.getFirstName())
                 .lastName(pastorRequest.getLastName())
                 .middleName(pastorRequest.getMiddleName())
                 .emailAddress(pastorRequest.getEmailAddress())
-                .pastorRole(PastorRole.fromString(pastorRequest.getPastorRole()))
+                .pastorRole(pastorRole)
                 .church(church)
                 .build();
 
@@ -79,10 +89,16 @@ public class PastorServiceImpl implements PastorService {
         pastor.setFirstName(pastorRequest.getFirstName());
         pastor.setLastName(pastorRequest.getLastName());
         pastor.setMiddleName(pastorRequest.getMiddleName());
-        pastor.setPastorRole(PastorRole.fromString(pastorRequest.getPastorRole()));
 
-        Church church = churchService.findChurchById(pastorRequest.getChurchId());
-        pastor.setChurch(church);
+        if (pastorRequest.getPastorRoleId() != null) {
+            PastorRole pastorRole = pastorRoleService.findPastorRole(pastorRequest.getPastorRoleId());
+            pastor.setPastorRole(pastorRole);
+        }
+
+        if (pastorRequest.getChurchId() != null) {
+            Church church = churchService.findChurchById(pastorRequest.getChurchId());
+            pastor.setChurch(church);
+        }
 
         pastorRepository.save(pastor);
 
