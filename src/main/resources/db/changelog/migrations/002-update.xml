@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
     http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="" author="hemen.hirekaan">
+    <changeSet id="1781559381945" author="hemen.hirekaan">
         <preConditions>
             <tableExists tableName="pastors" />
             <columnExists tableName="pastors" columnName="church_id" />
@@ -13,5 +13,23 @@
 
         <dropNotNullConstraint tableName="pastors" columnName="church_id" columnDataType="BIGINT" />
     </changeSet>
+    
+    <changeSet id="1781560080749" author="hemen.hirekaan">
+        <preConditions>
+            <tableExists tableName="churches" />
+            <columnExists tableName="churches" columnName="church_id" />
+        </preConditions>
 
+        <dropNotNullConstraint tableName="churches" columnName="church_id" columnDataType="BIGINT" />
+    </changeSet>
+
+    <changeSet id="1781561669924" author="hemen.hirekaan">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="pastors" />
+        </preConditions>
+
+        <addColumn tableName="pastors">
+            <column name="gender" type="VARCHAR(255)" defaultValue="M" />
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

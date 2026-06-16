@@ -20,6 +20,8 @@ public class PastorRequest {
     @NotBlank(message = "Firstname is required!")
     private String firstName;
 
+    private String gender;
+
     private String middleName;
 
     private String emailAddress;

@@ -17,6 +17,8 @@ public class PastorResponse {
     private String middleName;
     private String firstName;
     private String emailAddress;
+    private String gender;
+    private String tel;
     private PastorRoleDTO pastorRole;
     private ChurchDTO church;
 }

@@ -28,6 +28,9 @@ public class Pastor extends Auditable {
     @Column(nullable = false)
     private String firstName;
 
+    @Builder.Default
+    private String gender = "M";
+
     private String middleName;
 
     @Column(unique = true)

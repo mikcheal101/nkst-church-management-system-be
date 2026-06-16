@@ -5,6 +5,15 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
     http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
+    <changeSet id="1781558885918" author="hemen.hirekaan">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="identity_seq" />
+            </not>
+        </preConditions>
+        <createSequence sequenceName="identity_seq" startValue="1" incrementBy="1"/>
+    </changeSet>
+
     <changeSet id="1781558885919" author="hemen.hirekaan">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -46,6 +55,30 @@
                                  constraintName="fk_church_parent_id"
                                  referencedTableName="churches"
                                  referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="1781558898661" author="hemen.hirekaan">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="pastor_roles" />
+            </not>
+        </preConditions>
+        <createTable tableName="pastor_roles">
+            <!-- Primary Key -->
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="created_by" type="VARCHAR(255)"/>
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+        </createTable>
     </changeSet>
 
     <changeSet id="1781558894859" author="hemen.hirekaan">
@@ -98,30 +131,6 @@
                                  referencedTableName="pastor_roles"
                                  referencedColumnNames="id"/>
 
-    </changeSet>
-
-    <changeSet id="1781558898661" author="hemen.hirekaan">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="pastor_roles" />
-            </not>
-        </preConditions>
-        <createTable tableName="pastor_roles">
-            <!-- Primary Key -->
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-
-            <column name="name" type="VARCHAR(255)">
-                <constraints nullable="false" unique="true"/>
-            </column>
-
-            <column name="created_at" type="TIMESTAMP"/>
-            <column name="updated_at" type="TIMESTAMP"/>
-            <column name="created_by" type="VARCHAR(255)"/>
-            <column name="updated_by" type="VARCHAR(255)"/>
-            <column name="deleted" type="BOOLEAN" defaultValueBoolean="false"/>
-        </createTable>
     </changeSet>
 
 </databaseChangeLog>

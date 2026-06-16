@@ -70,6 +70,8 @@ public class PastorServiceImpl implements PastorService {
                 .emailAddress(pastorRequest.getEmailAddress())
                 .pastorRole(pastorRole)
                 .church(church)
+                .gender(pastorRequest.getGender())
+                .tel(pastorRequest.getTel())
                 .build();
 
         pastorRepository.save(pastor);
@@ -89,6 +91,7 @@ public class PastorServiceImpl implements PastorService {
         pastor.setFirstName(pastorRequest.getFirstName());
         pastor.setLastName(pastorRequest.getLastName());
         pastor.setMiddleName(pastorRequest.getMiddleName());
+        pastor.setGender(pastorRequest.getGender());
 
         if (pastorRequest.getPastorRoleId() != null) {
             PastorRole pastorRole = pastorRoleService.findPastorRole(pastorRequest.getPastorRoleId());
