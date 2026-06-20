@@ -29,7 +29,7 @@ public class PastorController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PastorResponse> getPastor(@PathVariable Long id) {
+    public ResponseEntity<PastorResponse> getPastor(@PathVariable("id") Long id) {
         PastorResponse pastorResponse = pastorService.getPastorById(id);
         return ResponseEntity.ok(pastorResponse);
     }
@@ -42,14 +42,14 @@ public class PastorController {
 
     @PutMapping("/{id}")
     public ResponseEntity<PastorResponse> updatePastor(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody @Valid PastorRequest pastorRequest) {
         PastorResponse pastorResponse = pastorService.updatePastor(id, pastorRequest);
         return ResponseEntity.ok(pastorResponse);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePastor(@PathVariable Long id) {
+    public ResponseEntity<Void> deletePastor(@PathVariable("id") Long id) {
         this.pastorService.deletePastorById(id);
         return ResponseEntity.noContent().build();
     }

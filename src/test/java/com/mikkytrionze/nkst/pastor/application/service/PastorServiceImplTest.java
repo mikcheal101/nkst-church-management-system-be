@@ -6,8 +6,9 @@ import static org.mockito.Mockito.*;
 
 import com.mikkytrionze.nkst.church.domain.model.Church;
 import com.mikkytrionze.nkst.church.domain.service.ChurchService;
-import com.mikkytrionze.nkst.member.domain.model.Gender;
+import com.mikkytrionze.nkst.member.domain.enums.Gender;
 import com.mikkytrionze.nkst.member.domain.model.Member;
+import com.mikkytrionze.nkst.member.domain.service.MemberService;
 import com.mikkytrionze.nkst.pastor.api.request.PastorRequest;
 import com.mikkytrionze.nkst.pastor.api.response.PastorResponse;
 import com.mikkytrionze.nkst.pastor.domain.model.Pastor;
@@ -39,6 +40,9 @@ class PastorServiceImplTest {
 
     @Mock
     private PastorRoleService pastorRoleService;
+
+    @Mock
+    private MemberService memberService;
 
     @InjectMocks
     private PastorServiceImpl pastorService;
@@ -135,23 +139,25 @@ class PastorServiceImplTest {
                 .pastorRoleId(1L)
                 .build();
 
+        Member createdMember = Member.builder()
+                .id(1L)
+                .firstName("John")
+                .lastName("Doe")
+                .middleName("M")
+                .emailAddress("john@test.com")
+                .tel("1234567890")
+                .gender(Gender.MALE)
+                .build();
         Pastor pastor = Pastor.builder()
                 .id(1L)
-                .member(Member.builder()
-                        .id(1L)
-                        .firstName("John")
-                        .lastName("Doe")
-                        .middleName("M")
-                        .emailAddress("john@test.com")
-                        .tel("1234567890")
-                        .gender(Gender.MALE)
-                        .build())
+                .member(createdMember)
                 .church(church)
                 .pastorRole(pastorRole)
                 .build();
 
         when(churchService.findChurchById(1L)).thenReturn(church);
         when(pastorRoleService.findPastorRole(1L)).thenReturn(pastorRole);
+        when(memberService.saveMember(any(Member.class))).thenReturn(createdMember);
         when(pastorRepository.save(any(Pastor.class))).thenReturn(pastor);
 
         PastorResponse result = pastorService.createPastor(request);
@@ -189,6 +195,15 @@ class PastorServiceImplTest {
                 .lastName("Doe")
                 .gender(Gender.MALE)
                 .build();
+        Member updatedMember = Member.builder()
+                .id(1L)
+                .firstName("Jane")
+                .lastName("Smith")
+                .middleName("A")
+                .emailAddress("jane@test.com")
+                .tel("9876543210")
+                .gender(Gender.FEMALE)
+                .build();
         Pastor existingPastor = Pastor.builder()
                 .id(pastorId)
                 .member(existingMember)
@@ -199,6 +214,7 @@ class PastorServiceImplTest {
         when(pastorRepository.findById(pastorId)).thenReturn(Optional.of(existingPastor));
         when(churchService.findChurchById(1L)).thenReturn(church);
         when(pastorRoleService.findPastorRole(1L)).thenReturn(pastorRole);
+        when(memberService.updateMember(eq(1L), any(Member.class))).thenReturn(updatedMember);
         when(pastorRepository.save(any(Pastor.class))).thenReturn(existingPastor);
 
         PastorResponse result = pastorService.updatePastor(pastorId, request);

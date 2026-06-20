@@ -37,20 +37,20 @@ public class ChurchController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ChurchResponse> updateChurch(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody @Valid ChurchRequest churchRequest) {
         ChurchResponse churchResponse = this.churchService.updateChurch(id, churchRequest);
         return ResponseEntity.ok().body(churchResponse);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ChurchResponse> getChurch(@PathVariable Long id) {
+    public ResponseEntity<ChurchResponse> getChurch(@PathVariable("id") Long id) {
         ChurchResponse churchResponse = this.churchService.getChurch(id);
         return ResponseEntity.ok().body(churchResponse);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteChurch(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteChurch(@PathVariable("id") Long id) {
         this.churchService.deleteChurch(id);
         return ResponseEntity.noContent().build();
     }

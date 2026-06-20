@@ -6,10 +6,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mikkytrionze.nkst.TestCacheConfig;
 import com.mikkytrionze.nkst.pastor.api.request.PastorRequest;
 import com.mikkytrionze.nkst.pastor.api.response.PastorResponse;
 import com.mikkytrionze.nkst.pastor.domain.service.PastorService;
+import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,6 +42,7 @@ class PastorControllerTest {
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
     }
 
     @Test
@@ -67,6 +70,12 @@ class PastorControllerTest {
                 .firstName("John")
                 .lastName("Doe")
                 .tel("1234567890")
+                .gender("MALE")
+                .serialNumber(123)
+                .dateOfBaptism(Instant.now())
+                .worshipCenter("Main Center")
+                .bibleVerse("John 3:16")
+                .baptisedBy("Pastor Mike")
                 .build();
 
         PastorResponse response = PastorResponse.builder()
@@ -108,6 +117,12 @@ class PastorControllerTest {
                 .firstName("Jane")
                 .lastName("Smith")
                 .tel("9876543210")
+                .gender("FEMALE")
+                .serialNumber(456)
+                .dateOfBaptism(Instant.now())
+                .worshipCenter("Main Center")
+                .bibleVerse("Romans 8:28")
+                .baptisedBy("Pastor Sarah")
                 .build();
 
         PastorResponse response = PastorResponse.builder()
