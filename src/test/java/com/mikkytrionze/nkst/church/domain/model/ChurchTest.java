@@ -2,6 +2,7 @@ package com.mikkytrionze.nkst.church.domain.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.mikkytrionze.nkst.member.domain.model.Member;
 import com.mikkytrionze.nkst.pastor.domain.model.Pastor;
 import com.mikkytrionze.nkst.pastor.domain.model.PastorRole;
 import java.util.Set;
@@ -34,9 +35,11 @@ class ChurchTest {
         PastorRole pastorRole = PastorRole.builder().name("Lead Pastor").build();
 
         Pastor pastor = Pastor.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .tel("1234567890")
+                .member(Member.builder()
+                        .firstName("John")
+                        .lastName("Doe")
+                        .tel("1234567890")
+                        .build())
                 .pastorRole(pastorRole)
                 .build();
 
@@ -75,15 +78,19 @@ class ChurchTest {
                 .build();
 
         Pastor pastor1 = Pastor.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .tel("111")
+                .member(Member.builder()
+                        .firstName("John")
+                        .lastName("Doe")
+                        .tel("111")
+                        .build())
                 .build();
 
         Pastor pastor2 = Pastor.builder()
-                .firstName("Jane")
-                .lastName("Doe")
-                .tel("222")
+                .member(Member.builder()
+                        .firstName("Jane")
+                        .lastName("Doe")
+                        .tel("222")
+                        .build())
                 .build();
 
         church.addPastor(pastor1);

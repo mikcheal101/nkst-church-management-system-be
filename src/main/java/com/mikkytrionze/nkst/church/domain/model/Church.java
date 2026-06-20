@@ -7,8 +7,8 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -38,11 +38,11 @@ public class Church extends Auditable {
 
     @Builder.Default
     @OneToMany(mappedBy = "parentChurch", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Church> subChurches = new LinkedHashSet<>();
+    private List<Church> subChurches = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "church", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Pastor> pastors = new LinkedHashSet<>();
+    private List<Pastor> pastors = new ArrayList<>();
 
     public void addPastor(Pastor pastor) {
         pastors.add(pastor);

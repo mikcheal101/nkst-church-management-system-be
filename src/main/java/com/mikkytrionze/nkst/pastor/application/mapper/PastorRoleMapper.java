@@ -3,15 +3,40 @@ package com.mikkytrionze.nkst.pastor.application.mapper;
 import com.mikkytrionze.nkst.pastor.api.response.PastorRoleResponse;
 import com.mikkytrionze.nkst.pastor.application.dto.PastorRoleDTO;
 import com.mikkytrionze.nkst.pastor.domain.model.PastorRole;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
-public interface PastorRoleMapper {
-    PastorRoleDTO toDTO(PastorRole pastorRole);
+import java.util.Objects;
 
-    PastorRoleResponse toResponse(PastorRole pastorRole);
+public class PastorRoleMapper {
+    public static PastorRoleDTO toDTO(PastorRole pastorRole) {
+        if (Objects.isNull(pastorRole)) {
+            return null;
+        }
 
-    @Mapping(target = "id", ignore = true)
-    PastorRole toEntity(PastorRoleDTO pastorRoleDTO);
+        return PastorRoleDTO.builder()
+                .id(pastorRole.getId())
+                .name(pastorRole.getName())
+                .build();
+    }
+
+    public static PastorRoleResponse toResponse(PastorRole pastorRole) {
+        if (Objects.isNull(pastorRole)) {
+            return null;
+        }
+
+        return PastorRoleResponse.builder()
+                .id(pastorRole.getId())
+                .name(pastorRole.getName())
+                .build();
+    }
+
+    public static PastorRole toEntity(PastorRoleDTO pastorRoleDTO) {
+        if (Objects.isNull(pastorRoleDTO)) {
+            return null;
+        }
+
+        return PastorRole.builder()
+                .id(pastorRoleDTO.getId())
+                .name(pastorRoleDTO.getName())
+                .build();
+    }
 }

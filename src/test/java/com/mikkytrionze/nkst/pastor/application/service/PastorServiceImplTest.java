@@ -6,6 +6,8 @@ import static org.mockito.Mockito.*;
 
 import com.mikkytrionze.nkst.church.domain.model.Church;
 import com.mikkytrionze.nkst.church.domain.service.ChurchService;
+import com.mikkytrionze.nkst.member.domain.model.Member;
+import com.mikkytrionze.nkst.member.domain.service.MemberService;
 import com.mikkytrionze.nkst.pastor.api.request.PastorRequest;
 import com.mikkytrionze.nkst.pastor.api.response.PastorResponse;
 import com.mikkytrionze.nkst.pastor.application.mapper.PastorMapper;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.mikkytrionze.nkst.pastor.domain.service.PastorRoleService;
+import com.mikkytrionze.nkst.shared.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,33 +36,31 @@ class PastorServiceImplTest {
     private PastorRepository pastorRepository;
 
     @Mock
-    private PastorMapper pastorMapper;
-
-    @Mock
     private ChurchService churchService;
 
     @Mock
     private PastorRoleService pastorRoleService;
 
+    @Mock
+    private MemberService memberService;
+
     @InjectMocks
     private PastorServiceImpl pastorService;
 
-    @BeforeEach
-    void setUp() {
-        pastorService = new PastorServiceImpl(
-                pastorRepository,
-                pastorMapper,
-                churchService,
-                pastorRoleService);
-    }
 
     @Test
     void shouldGetPastorById() {
-        Pastor pastor = Pastor.builder().id(1L).firstName("John").lastName("Doe").build();
+        Pastor pastor = Pastor.builder()
+                .id(1L)
+                .member(Member.builder()
+                        .firstName("John")
+                        .lastName("Doe")
+                        .build())
+                .build();
         PastorResponse response = PastorResponse.builder().id(1L).firstName("John").lastName("Doe").build();
 
         when(pastorRepository.findById(1L)).thenReturn(Optional.of(pastor));
-        when(pastorMapper.toResponse(pastor)).thenReturn(response);
+        when(PastorMapper.toResponse(pastor)).thenReturn(response);
 
         PastorResponse result = pastorService.getPastorById(1L);
 
@@ -72,7 +73,7 @@ class PastorServiceImplTest {
     void shouldThrowExceptionWhenPastorNotFound() {
         when(pastorRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> pastorService.getPastorById(99L));
+        assertThrows(ResourceNotFoundException.class, () -> pastorService.getPastorById(99L));
     }
 
     @Test
@@ -82,13 +83,23 @@ class PastorServiceImplTest {
 
     @Test
     void shouldGetAllPastors() {
-        Pastor pastor = Pastor.builder().id(1L).firstName("John").lastName("Doe").build();
-        PastorResponse response = PastorResponse.builder().id(1L).firstName("John").lastName("Doe").build();
+        Pastor pastor = Pastor.builder()
+                .id(1L)
+                .member(Member.builder()
+                        .firstName("John")
+                        .lastName("Doe")
+                        .build())
+                .build();
+        PastorResponse response = PastorResponse.builder()
+                .id(1L)
+                .firstName("John")
+                .lastName("Doe")
+                .build();
         PageRequest pageable = PageRequest.of(0, 20);
         Page<Pastor> pastorPage = new PageImpl<>(List.of(pastor));
 
         when(pastorRepository.findAll(pageable)).thenReturn(pastorPage);
-        when(pastorMapper.toResponse(pastor)).thenReturn(response);
+        when(PastorMapper.toResponse(pastor)).thenReturn(response);
 
         Page<PastorResponse> result = pastorService.getPastors(pageable);
 
@@ -112,11 +123,13 @@ class PastorServiceImplTest {
                 .build();
 
         Pastor pastor = Pastor.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .middleName("M")
-                .emailAddress("john@test.com")
-                .tel("1234567890")
+                .member(Member.builder()
+                        .firstName("John")
+                        .lastName("Doe")
+                        .middleName("M")
+                        .emailAddress("john@test.com")
+                        .tel("1234567890")
+                        .build())
                 .church(church)
                 .pastorRole(pastorRole)
                 .build();
@@ -129,7 +142,7 @@ class PastorServiceImplTest {
         when(churchService.findChurchById(1L)).thenReturn(church);
         when(pastorRoleService.findPastorRole(1L)).thenReturn(pastorRole);
         when(pastorRepository.save(any(Pastor.class))).thenReturn(pastor);
-        when(pastorMapper.toResponse(any(Pastor.class))).thenReturn(response);
+        when(PastorMapper.toResponse(any(Pastor.class))).thenReturn(response);
 
         PastorResponse result = pastorService.createPastor(request);
 
@@ -156,8 +169,10 @@ class PastorServiceImplTest {
         PastorRole existingRole = PastorRole.builder().id(2L).name("Associate Pastor").build();
         Pastor existingPastor = Pastor.builder()
                 .id(pastorId)
-                .firstName("John")
-                .lastName("Doe")
+                .member(Member.builder()
+                        .firstName("John")
+                        .lastName("Doe")
+                        .build())
                 .church(church)
                 .pastorRole(existingRole)
                 .build();
@@ -171,7 +186,7 @@ class PastorServiceImplTest {
         when(churchService.findChurchById(1L)).thenReturn(church);
         when(pastorRoleService.findPastorRole(1L)).thenReturn(pastorRole);
         when(pastorRepository.save(any(Pastor.class))).thenReturn(existingPastor);
-        when(pastorMapper.toResponse(any(Pastor.class))).thenReturn(response);
+        when(PastorMapper.toResponse(any(Pastor.class))).thenReturn(response);
 
         PastorResponse result = pastorService.updatePastor(pastorId, request);
 
@@ -189,7 +204,13 @@ class PastorServiceImplTest {
     @Test
     void shouldSoftDeletePastor() {
         Long pastorId = 1L;
-        Pastor pastor = Pastor.builder().id(pastorId).firstName("John").lastName("Doe").build();
+        Pastor pastor = Pastor.builder()
+                .id(pastorId)
+                .member(Member.builder()
+                    .firstName("John")
+                    .lastName("Doe")
+                    .build())
+                .build();
 
         when(pastorRepository.findById(pastorId)).thenReturn(Optional.of(pastor));
         when(pastorRepository.save(any(Pastor.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -209,7 +230,7 @@ class PastorServiceImplTest {
     void shouldThrowExceptionWhenUpdatingNonExistentPastor() {
         when(pastorRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(ResourceNotFoundException.class,
                 () -> pastorService.updatePastor(99L, PastorRequest.builder().build()));
     }
 }

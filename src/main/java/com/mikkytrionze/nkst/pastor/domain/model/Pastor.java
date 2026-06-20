@@ -1,5 +1,6 @@
 package com.mikkytrionze.nkst.pastor.domain.model;
 
+import com.mikkytrionze.nkst.member.domain.model.Member;
 import com.mikkytrionze.nkst.shared.domain.Auditable;
 import com.mikkytrionze.nkst.church.domain.model.Church;
 import jakarta.persistence.*;
@@ -15,26 +16,11 @@ import org.hibernate.annotations.SQLRestriction;
 @Table(name = "pastors")
 @SuperBuilder(toBuilder = true)
 @SQLRestriction("deleted = false")
-@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class Pastor extends Auditable {
 
-    @EqualsAndHashCode.Include
-    @Column(unique = true, nullable = false)
-    private String tel;
-
-    @Column(nullable = false)
-    private String lastName;
-
-    @Column(nullable = false)
-    private String firstName;
-
-    @Builder.Default
-    private String gender = "M";
-
-    private String middleName;
-
-    @Column(unique = true)
-    private String emailAddress;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "member_id", referencedColumnName = "id")
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "church_id")

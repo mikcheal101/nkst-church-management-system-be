@@ -1,5 +1,9 @@
 package com.mikkytrionze.nkst.pastor.application.service;
 
+import com.mikkytrionze.nkst.member.domain.enums.Gender;
+import com.mikkytrionze.nkst.member.domain.model.BaptismRecord;
+import com.mikkytrionze.nkst.member.domain.model.Member;
+import com.mikkytrionze.nkst.member.domain.service.MemberService;
 import com.mikkytrionze.nkst.pastor.api.response.PastorResponse;
 import com.mikkytrionze.nkst.pastor.application.mapper.PastorMapper;
 import com.mikkytrionze.nkst.pastor.api.request.PastorRequest;
@@ -10,6 +14,8 @@ import com.mikkytrionze.nkst.pastor.domain.repository.PastorRepository;
 import com.mikkytrionze.nkst.church.domain.service.ChurchService;
 import com.mikkytrionze.nkst.pastor.domain.service.PastorRoleService;
 import com.mikkytrionze.nkst.pastor.domain.service.PastorService;
+import com.mikkytrionze.nkst.shared.exception.ResourceNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -25,9 +31,9 @@ import org.springframework.stereotype.Service;
 public class PastorServiceImpl implements PastorService {
 
     private final PastorRepository pastorRepository;
-    private final PastorMapper pastorMapper;
     private final ChurchService churchService;
     private final PastorRoleService pastorRoleService;
+    private final MemberService memberService;
 
     @Override
     public Page<PastorResponse> getPastors(Pageable pageable) {
@@ -35,7 +41,7 @@ public class PastorServiceImpl implements PastorService {
 
         Page<Pastor> pastorsPage = pastorRepository.findAll(pageable);
 
-        return pastorsPage.map(pastorMapper::toResponse);
+        return pastorsPage.map(PastorMapper::toResponse);
     }
 
     @Override
@@ -45,10 +51,11 @@ public class PastorServiceImpl implements PastorService {
 
         Pastor pastor = findPastorById(id);
 
-        return pastorMapper.toResponse(pastor);
+        return PastorMapper.toResponse(pastor);
     }
 
     @Override
+    @Transactional
     public PastorResponse createPastor(PastorRequest pastorRequest) {
         log.info("Creating a pastor with name: {} {}", pastorRequest.getFirstName(), pastorRequest.getLastName());
 
@@ -63,22 +70,38 @@ public class PastorServiceImpl implements PastorService {
             pastorRole = pastorRoleService.findPastorRole(pastorRequest.getPastorRoleId());
         }
 
-        Pastor pastor = Pastor.builder()
+        Member member = memberService.saveMember(Member.builder()
                 .firstName(pastorRequest.getFirstName())
                 .lastName(pastorRequest.getLastName())
                 .middleName(pastorRequest.getMiddleName())
                 .emailAddress(pastorRequest.getEmailAddress())
+                .gender(Gender.valueOf(pastorRequest.getGender()))
+                .tel(pastorRequest.getTel())
+                .baptismRecord(BaptismRecord.builder()
+                        .dateOfBaptism(pastorRequest.getDateOfBaptism())
+                        .baptizedBy(pastorRequest.getBaptisedBy())
+                        .address(pastorRequest.getAddress())
+                        .bibleVerse(pastorRequest.getBibleVerse())
+                        .remark(pastorRequest.getRemark())
+                        .imageUri(pastorRequest.getImageUri())
+                        .serialNumber(pastorRequest.getSerialNumber())
+                        .worshipCenter(pastorRequest.getWorshipCenter())
+                        .build())
+                .isBaptised(true)
+                .build());
+
+        Pastor pastor = Pastor.builder()
+                .member(member)
                 .pastorRole(pastorRole)
                 .church(church)
-                .gender(pastorRequest.getGender())
-                .tel(pastorRequest.getTel())
                 .build();
 
         pastorRepository.save(pastor);
-        return pastorMapper.toResponse(pastor);
+        return PastorMapper.toResponse(pastor);
     }
 
     @Override
+    @Transactional
     @CachePut(value = "pastors", key = "#id")
     public PastorResponse updatePastor(Long id, PastorRequest pastorRequest) throws IllegalArgumentException {
         log.info("Updating a pastor entity with id: {}", id);
@@ -86,12 +109,26 @@ public class PastorServiceImpl implements PastorService {
         // fetch the pastor
         Pastor pastor = findPastorById(id);
 
-        pastor.setTel(pastorRequest.getTel());
-        pastor.setEmailAddress(pastorRequest.getEmailAddress());
-        pastor.setFirstName(pastorRequest.getFirstName());
-        pastor.setLastName(pastorRequest.getLastName());
-        pastor.setMiddleName(pastorRequest.getMiddleName());
-        pastor.setGender(pastorRequest.getGender());
+        Member member = memberService.updateMember(pastor.getMember().getId(), Member.builder()
+                .firstName(pastorRequest.getFirstName())
+                .lastName(pastorRequest.getLastName())
+                .middleName(pastorRequest.getMiddleName())
+                .emailAddress(pastorRequest.getEmailAddress())
+                .gender(Gender.valueOf(pastorRequest.getGender()))
+                .tel(pastorRequest.getTel())
+                .baptismRecord(BaptismRecord.builder()
+                        .dateOfBaptism(pastorRequest.getDateOfBaptism())
+                        .baptizedBy(pastorRequest.getBaptisedBy())
+                        .address(pastorRequest.getAddress())
+                        .bibleVerse(pastorRequest.getBibleVerse())
+                        .remark(pastorRequest.getRemark())
+                        .imageUri(pastorRequest.getImageUri())
+                        .serialNumber(pastorRequest.getSerialNumber())
+                        .worshipCenter(pastorRequest.getWorshipCenter())
+                        .build())
+                .build());
+
+        pastor.setMember(member);
 
         if (pastorRequest.getPastorRoleId() != null) {
             PastorRole pastorRole = pastorRoleService.findPastorRole(pastorRequest.getPastorRoleId());
@@ -105,7 +142,7 @@ public class PastorServiceImpl implements PastorService {
 
         pastorRepository.save(pastor);
 
-        return pastorMapper.toResponse(pastor);
+        return PastorMapper.toResponse(pastor);
     }
 
     @Override
@@ -120,12 +157,12 @@ public class PastorServiceImpl implements PastorService {
         pastorRepository.save(pastor);
     }
 
-    private Pastor findPastorById(Long id) throws IllegalArgumentException {
+    private Pastor findPastorById(Long id) throws IllegalArgumentException, ResourceNotFoundException {
         if (id == null) {
             throw new IllegalArgumentException("Id is required!");
         }
 
         return pastorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Pastor not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Pastor", id));
     }
 }

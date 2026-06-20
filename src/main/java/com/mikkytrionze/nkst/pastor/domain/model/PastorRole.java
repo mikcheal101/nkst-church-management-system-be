@@ -6,8 +6,8 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,5 +25,5 @@ public class PastorRole extends Auditable {
 
     @Builder.Default
     @OneToMany(mappedBy = "pastorRole", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Pastor> pastors = new LinkedHashSet<>();
+    private List<Pastor> pastors = new ArrayList<>();
 }

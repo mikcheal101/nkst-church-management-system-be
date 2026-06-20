@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 public class PastorRoleServiceImpl implements PastorRoleService {
 
     private final PastorRoleRepository pastorRoleRepository;
-    private final PastorRoleMapper pastorRoleMapper;
 
     @Override
     public Page<PastorRoleResponse> getPastorRoles(Pageable pageable) {
@@ -26,7 +25,7 @@ public class PastorRoleServiceImpl implements PastorRoleService {
 
         Page<PastorRole> pastorRoles = this.pastorRoleRepository.findAll(pageable);
 
-        return pastorRoles.map(pastorRoleMapper::toResponse);
+        return pastorRoles.map(PastorRoleMapper::toResponse);
     }
 
     @Override
@@ -35,7 +34,7 @@ public class PastorRoleServiceImpl implements PastorRoleService {
 
         PastorRole pastorRole = findPastorRoleById(id);
 
-        return pastorRoleMapper.toResponse(pastorRole);
+        return PastorRoleMapper.toResponse(pastorRole);
     }
 
     @Override

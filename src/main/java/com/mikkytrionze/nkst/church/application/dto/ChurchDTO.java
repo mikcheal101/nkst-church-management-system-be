@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -14,8 +15,15 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class ChurchDTO {
     private Long id;
+    private String telNumber;
+    private String emailAddress;
     private String name;
     private String address;
     private ChurchDTO parentChurch;
-    private List<PastorDTO> pastors;
+
+    @Builder.Default
+    private List<PastorDTO> pastors = new ArrayList<>();
+
+    @Builder.Default
+    private List<ChurchDTO> subChurches = new ArrayList<>();
 }

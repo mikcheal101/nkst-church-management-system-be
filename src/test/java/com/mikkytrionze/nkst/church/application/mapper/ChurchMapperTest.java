@@ -5,18 +5,20 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.mikkytrionze.nkst.church.application.dto.ChurchDTO;
 import com.mikkytrionze.nkst.church.api.response.ChurchResponse;
 import com.mikkytrionze.nkst.church.domain.model.Church;
+import com.mikkytrionze.nkst.member.application.dto.MemberDTO;
+import com.mikkytrionze.nkst.member.domain.model.Member;
 import com.mikkytrionze.nkst.pastor.application.dto.PastorDTO;
 import com.mikkytrionze.nkst.pastor.application.dto.PastorRoleDTO;
 import com.mikkytrionze.nkst.pastor.domain.model.Pastor;
 import com.mikkytrionze.nkst.pastor.domain.model.PastorRole;
+
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
 
 class ChurchMapperTest {
 
-    private final ChurchMapper mapper = Mappers.getMapper(ChurchMapper.class);
-
+    
     @Test
     void shouldMapChurchToDTO() {
         Church church = Church.builder()
@@ -25,7 +27,7 @@ class ChurchMapperTest {
                 .address("123 Main St")
                 .build();
 
-        ChurchDTO dto = mapper.toDTO(church);
+        ChurchDTO dto = ChurchMapper.toDTO(church);
 
         assertNotNull(dto);
         assertEquals(1L, dto.getId());
@@ -41,7 +43,7 @@ class ChurchMapperTest {
                 .address("123 Main St")
                 .build();
 
-        ChurchResponse response = mapper.toResponse(church);
+        ChurchResponse response = ChurchMapper.toResponse(church);
 
         assertNotNull(response);
         assertEquals(1L, response.getId());
@@ -57,7 +59,7 @@ class ChurchMapperTest {
                 .address("123 Main St")
                 .build();
 
-        Church church = mapper.toEntity(dto);
+        Church church = ChurchMapper.toEntity(dto);
 
         assertNotNull(church);
         assertNull(church.getId());
@@ -67,9 +69,9 @@ class ChurchMapperTest {
 
     @Test
     void shouldReturnNullWhenChurchIsNull() {
-        assertNull(mapper.toDTO(null));
-        assertNull(mapper.toResponse(null));
-        assertNull(mapper.toEntity(null));
+        assertNull(ChurchMapper.toDTO(null));
+        assertNull(ChurchMapper.toResponse(null));
+        assertNull(ChurchMapper.toEntity(null));
     }
 
     @Test
@@ -80,10 +82,15 @@ class ChurchMapperTest {
                 .build();
 
         PastorRole pastorRole = PastorRole.builder().name("Lead Pastor").build();
-        Pastor pastor = Pastor.builder()
-                .id(1L)
+
+        Member member = Member.builder()
                 .firstName("John")
                 .lastName("Doe")
+                .build();
+
+        Pastor pastor = Pastor.builder()
+                .id(1L)
+                .member(member)
                 .pastorRole(pastorRole)
                 .build();
 
@@ -92,17 +99,17 @@ class ChurchMapperTest {
                 .name("Main Church")
                 .address("123 Main St")
                 .parentChurch(parent)
-                .pastors(new java.util.LinkedHashSet<>(List.of(pastor)))
+                .pastors(List.of(pastor))
                 .build();
 
-        ChurchDTO dto = mapper.toDTO(church);
+        ChurchDTO dto = ChurchMapper.toDTO(church);
         assertNotNull(dto);
         assertNotNull(dto.getParentChurch());
         assertEquals("Parent Church", dto.getParentChurch().getName());
         assertNotNull(dto.getPastors());
         assertEquals(1, dto.getPastors().size());
 
-        ChurchResponse response = mapper.toResponse(church);
+        ChurchResponse response = ChurchMapper.toResponse(church);
         assertNotNull(response);
         assertNotNull(response.getParentChurch());
         assertNotNull(response.getPastors());
@@ -110,10 +117,14 @@ class ChurchMapperTest {
 
     @Test
     void shouldMapDTOToEntityWithNestedObjects() {
-        PastorDTO pastorDTO = PastorDTO.builder()
-                .id(1L)
+        MemberDTO memberDTO = MemberDTO.builder()
                 .firstName("John")
                 .lastName("Doe")
+                .build();
+
+        PastorDTO pastorDTO = PastorDTO.builder()
+                .id(1L)
+                .memberDTO(memberDTO)
                 .pastorRoleDTO(PastorRoleDTO.builder().name("Lead Pastor").build())
                 .build();
 
@@ -130,7 +141,7 @@ class ChurchMapperTest {
                 .pastors(List.of(pastorDTO))
                 .build();
 
-        Church church = mapper.toEntity(churchDTO);
+        Church church = ChurchMapper.toEntity(churchDTO);
 
         assertNotNull(church);
         assertNull(church.getId());
@@ -145,41 +156,48 @@ class ChurchMapperTest {
         Church church = Church.builder()
                 .id(1L)
                 .name("Church")
-                .pastors(new java.util.LinkedHashSet<>())
+                .pastors(List.of())
                 .build();
 
-        ChurchDTO dto = mapper.toDTO(church);
+        ChurchDTO dto = ChurchMapper.toDTO(church);
         assertNotNull(dto.getPastors());
         assertTrue(dto.getPastors().isEmpty());
     }
 
     @Test
     void shouldMapPastorWithNullRole() {
+        Member member = Member.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .tel("123")
+                .build();
         Pastor pastor = new Pastor();
         pastor.setId(1L);
-        pastor.setFirstName("John");
-        pastor.setLastName("Doe");
-        pastor.setTel("123");
+        pastor.setMember(member);
         pastor.setPastorRole(null);
 
         Church church = Church.builder()
                 .id(1L)
                 .name("Church")
-                .pastors(new java.util.LinkedHashSet<>(List.of(pastor)))
+                .pastors(List.of(pastor))
                 .build();
 
-        ChurchDTO dto = mapper.toDTO(church);
+        ChurchDTO dto = ChurchMapper.toDTO(church);
         assertNotNull(dto.getPastors());
         assertEquals(1, dto.getPastors().size());
-        assertNull(dto.getPastors().getFirst().getPastorRoleDTO());
+        assertNull(dto.getPastors().stream().toList().getFirst().getPastorRoleDTO());
     }
 
     @Test
     void shouldMapPastorDTOWithNullRoleToEntity() {
-        PastorDTO pastorDTO = PastorDTO.builder()
-                .id(1L)
+        MemberDTO memberDTO = MemberDTO.builder()
                 .firstName("John")
                 .lastName("Doe")
+                .build();
+
+        PastorDTO pastorDTO = PastorDTO.builder()
+                .id(1L)
+                .memberDTO(memberDTO)
                 .build();
 
         ChurchDTO churchDTO = ChurchDTO.builder()
@@ -188,7 +206,7 @@ class ChurchMapperTest {
                 .pastors(List.of(pastorDTO))
                 .build();
 
-        Church church = mapper.toEntity(churchDTO);
+        Church church = ChurchMapper.toEntity(churchDTO);
         assertNotNull(church);
         assertFalse(church.getPastors().isEmpty());
         assertNull(church.getPastors().iterator().next().getPastorRole());
@@ -196,14 +214,14 @@ class ChurchMapperTest {
 
     @Test
     void shouldHandleNullPastorsSet() {
-        Church church = new Church();
-        church.setId(1L);
-        church.setName("Church");
-        church.setPastors(null);
+        Church church = Church.builder()
+                        .id(1L)
+                        .name("Church")
+                        .build();
 
-        ChurchDTO dto = mapper.toDTO(church);
+        ChurchDTO dto = ChurchMapper.toDTO(church);
         assertNotNull(dto);
-        assertNull(dto.getPastors());
+        assertTrue(dto.getPastors().isEmpty());
     }
 
     @Test
@@ -213,7 +231,7 @@ class ChurchMapperTest {
                 .name("Church")
                 .build();
 
-        Church church = mapper.toEntity(churchDTO);
+        Church church = ChurchMapper.toEntity(churchDTO);
         assertNotNull(church);
         assertTrue(church.getPastors() == null || church.getPastors().isEmpty());
     }

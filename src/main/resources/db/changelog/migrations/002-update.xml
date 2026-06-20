@@ -32,4 +32,26 @@
             <column name="gender" type="VARCHAR(255)" defaultValue="M" />
         </addColumn>
     </changeSet>
+
+    <changeSet id="1781633654835" author="hemen.hirekaan">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="pastors" />
+        </preConditions>
+
+        <addColumn tableName="pastors">
+            <column name="member_id" type="BIGINT"/>
+        </addColumn>
+
+        <addForeignKeyConstraint baseTableName="pastors"
+                                 baseColumnNames="member_id"
+                                 constraintName="fk_pastor_member"
+                                 referencedTableName="members"
+                                 referencedColumnNames="id"/>
+
+        <dropColumn tableName="pastors" columnName="tel"/>
+        <dropColumn tableName="pastors" columnName="last_name"/>
+        <dropColumn tableName="pastors" columnName="first_name"/>
+        <dropColumn tableName="pastors" columnName="middle_name"/>
+        <dropColumn tableName="pastors" columnName="email_address"/>
+    </changeSet>
 </databaseChangeLog>

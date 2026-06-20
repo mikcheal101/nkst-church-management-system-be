@@ -26,7 +26,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ChurchServiceImpl implements ChurchService {
 
-    private final ChurchMapper churchMapper;
     private final ChurchRepository churchRepository;
 
     @Override
@@ -46,7 +45,7 @@ public class ChurchServiceImpl implements ChurchService {
     public ChurchResponse getChurch(Long id) {
         log.info("Get Church with id: {}", id);
         Church church = getChurchById(id);
-        return churchMapper.toResponse(church);
+        return ChurchMapper.toResponse(church);
     }
 
     @Override
@@ -61,7 +60,7 @@ public class ChurchServiceImpl implements ChurchService {
                 .parentChurch(parentChurch)
                 .build();
         Church savedChurch = churchRepository.save(church);
-        return churchMapper.toResponse(savedChurch);
+        return ChurchMapper.toResponse(savedChurch);
     }
 
     @Override
@@ -92,7 +91,7 @@ public class ChurchServiceImpl implements ChurchService {
         existingChurch.setAddress(churchRequest.getAddress());
 
         Church updatedChurch = churchRepository.save(existingChurch);
-        return churchMapper.toResponse(updatedChurch);
+        return ChurchMapper.toResponse(updatedChurch);
     }
 
     @Override
@@ -101,7 +100,7 @@ public class ChurchServiceImpl implements ChurchService {
 
         Page<Church> churchPage = churchRepository.findAll(pageable);
 
-        return churchPage.map(churchMapper::toResponse);
+        return churchPage.map(ChurchMapper::toResponse);
     }
 
     @Override

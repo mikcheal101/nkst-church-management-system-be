@@ -26,7 +26,7 @@ import org.springframework.data.domain.PageRequest;
 class ChurchServiceImplTest {
 
     @Mock
-    private ChurchMapper churchMapper;
+    private ChurchMapper ChurchMapper;
 
     @Mock
     private ChurchRepository churchRepository;
@@ -35,7 +35,7 @@ class ChurchServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        churchService = new ChurchServiceImpl(churchMapper, churchRepository);
+        churchService = new ChurchServiceImpl(churchRepository);
     }
 
     @Test
@@ -44,7 +44,7 @@ class ChurchServiceImplTest {
         ChurchResponse response = ChurchResponse.builder().id(1L).name("Main Church").build();
 
         when(churchRepository.findById(1L)).thenReturn(Optional.of(church));
-        when(churchMapper.toResponse(church)).thenReturn(response);
+        when(ChurchMapper.toResponse(church)).thenReturn(response);
 
         ChurchResponse result = churchService.getChurch(1L);
 
@@ -68,7 +68,7 @@ class ChurchServiceImplTest {
         Page<Church> churchPage = new PageImpl<>(List.of(church));
 
         when(churchRepository.findAll(pageable)).thenReturn(churchPage);
-        when(churchMapper.toResponse(church)).thenReturn(response);
+        when(ChurchMapper.toResponse(church)).thenReturn(response);
 
         Page<ChurchResponse> result = churchService.getChurches(pageable);
 
@@ -102,7 +102,7 @@ class ChurchServiceImplTest {
                 .build();
 
         when(churchRepository.save(any(Church.class))).thenReturn(savedChurch);
-        when(churchMapper.toResponse(savedChurch)).thenReturn(response);
+        when(ChurchMapper.toResponse(savedChurch)).thenReturn(response);
 
         ChurchResponse result = churchService.createChurch(request);
 
@@ -142,7 +142,7 @@ class ChurchServiceImplTest {
 
         when(churchRepository.findById(1L)).thenReturn(Optional.of(parentChurch));
         when(churchRepository.save(any(Church.class))).thenReturn(savedChurch);
-        when(churchMapper.toResponse(savedChurch)).thenReturn(response);
+        when(ChurchMapper.toResponse(savedChurch)).thenReturn(response);
 
         ChurchResponse result = churchService.createChurch(request);
 
@@ -179,7 +179,7 @@ class ChurchServiceImplTest {
         when(churchRepository.findById(churchId)).thenReturn(Optional.of(existingChurch));
         when(churchRepository.existsByName("Updated Church")).thenReturn(false);
         when(churchRepository.save(any(Church.class))).thenReturn(updatedChurch);
-        when(churchMapper.toResponse(updatedChurch)).thenReturn(response);
+        when(ChurchMapper.toResponse(updatedChurch)).thenReturn(response);
 
         ChurchResponse result = churchService.updateChurch(churchId, request);
 
@@ -237,7 +237,7 @@ class ChurchServiceImplTest {
 
         when(churchRepository.findById(churchId)).thenReturn(Optional.of(existingChurch));
         when(churchRepository.save(any(Church.class))).thenReturn(updatedChurch);
-        when(churchMapper.toResponse(updatedChurch)).thenReturn(response);
+        when(ChurchMapper.toResponse(updatedChurch)).thenReturn(response);
 
         ChurchResponse result = churchService.updateChurch(churchId, request);
 
@@ -282,7 +282,7 @@ class ChurchServiceImplTest {
         when(churchRepository.findById(newParentId)).thenReturn(Optional.of(parent));
         when(churchRepository.existsByName("Updated Church")).thenReturn(false);
         when(churchRepository.save(any(Church.class))).thenReturn(updatedChurch);
-        when(churchMapper.toResponse(updatedChurch)).thenReturn(response);
+        when(ChurchMapper.toResponse(updatedChurch)).thenReturn(response);
 
         ChurchResponse result = churchService.updateChurch(churchId, request);
 
@@ -324,7 +324,7 @@ class ChurchServiceImplTest {
         when(churchRepository.findById(churchId)).thenReturn(Optional.of(existingChurch));
         when(churchRepository.existsByName("Updated Church")).thenReturn(false);
         when(churchRepository.save(any(Church.class))).thenReturn(updatedChurch);
-        when(churchMapper.toResponse(updatedChurch)).thenReturn(response);
+        when(ChurchMapper.toResponse(updatedChurch)).thenReturn(response);
 
         ChurchResponse result = churchService.updateChurch(churchId, request);
 
@@ -364,7 +364,7 @@ class ChurchServiceImplTest {
         when(churchRepository.findById(churchId)).thenReturn(Optional.of(existingChurch));
         when(churchRepository.existsByName("Updated Church")).thenReturn(false);
         when(churchRepository.save(any(Church.class))).thenReturn(updatedChurch);
-        when(churchMapper.toResponse(updatedChurch)).thenReturn(response);
+        when(ChurchMapper.toResponse(updatedChurch)).thenReturn(response);
 
         ChurchResponse result = churchService.updateChurch(churchId, request);
 

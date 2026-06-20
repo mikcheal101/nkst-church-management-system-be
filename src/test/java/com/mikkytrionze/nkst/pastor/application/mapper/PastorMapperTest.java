@@ -4,12 +4,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.mikkytrionze.nkst.church.application.dto.ChurchDTO;
 import com.mikkytrionze.nkst.church.domain.model.Church;
+import com.mikkytrionze.nkst.member.application.dto.MemberDTO;
+import com.mikkytrionze.nkst.member.domain.model.Member;
 import com.mikkytrionze.nkst.pastor.api.response.PastorResponse;
 import com.mikkytrionze.nkst.pastor.application.dto.PastorDTO;
 import com.mikkytrionze.nkst.pastor.application.dto.PastorRoleDTO;
 import com.mikkytrionze.nkst.pastor.domain.model.Pastor;
 import com.mikkytrionze.nkst.pastor.domain.model.PastorRole;
-import java.util.Set;
+
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
@@ -22,10 +25,12 @@ class PastorMapperTest {
         PastorRole pastorRole = PastorRole.builder().name("Lead Pastor").build();
         Pastor pastor = Pastor.builder()
                 .id(1L)
-                .firstName("John")
-                .lastName("Doe")
-                .middleName("M")
-                .emailAddress("john@test.com")
+                .member(Member.builder()
+                        .firstName("John")
+                        .lastName("Doe")
+                        .middleName("M")
+                        .emailAddress("john@test.com")
+                        .build())
                 .pastorRole(pastorRole)
                 .build();
 
@@ -33,19 +38,21 @@ class PastorMapperTest {
 
         assertNotNull(dto);
         assertEquals(1L, dto.getId());
-        assertEquals("John", dto.getFirstName());
-        assertEquals("Doe", dto.getLastName());
-        assertEquals("M", dto.getMiddleName());
-        assertEquals("john@test.com", dto.getEmailAddress());
+        assertEquals("John", dto.getMemberDTO().getFirstName());
+        assertEquals("Doe", dto.getMemberDTO().getLastName());
+        assertEquals("M", dto.getMemberDTO().getMiddleName());
+        assertEquals("john@test.com", dto.getMemberDTO().getEmailAddress());
     }
 
     @Test
     void shouldMapPastorToDTOWithNullRole() {
         Pastor pastor = Pastor.builder()
                 .id(1L)
-                .firstName("John")
-                .lastName("Doe")
-                .tel("123")
+                .member(Member.builder()
+                        .firstName("John")
+                        .lastName("Doe")
+                        .tel("123")
+                        .build())
                 .pastorRole(null)
                 .build();
 
@@ -64,9 +71,11 @@ class PastorMapperTest {
         PastorRole pastorRole = PastorRole.builder().name("Lead Pastor").build();
         Pastor pastor = Pastor.builder()
                 .id(1L)
-                .firstName("John")
-                .lastName("Doe")
-                .emailAddress("john@test.com")
+                .member(Member.builder()
+                        .firstName("John")
+                        .lastName("Doe")
+                        .emailAddress("john@test.com")
+                        .build())
                 .pastorRole(pastorRole)
                 .church(church)
                 .build();
@@ -89,9 +98,11 @@ class PastorMapperTest {
     void shouldMapPastorToResponseWithNullRole() {
         Pastor pastor = Pastor.builder()
                 .id(1L)
-                .firstName("John")
-                .lastName("Doe")
-                .tel("123")
+                .member(Member.builder()
+                        .firstName("John")
+                        .lastName("Doe")
+                        .tel("123")
+                        .build())
                 .pastorRole(null)
                 .build();
 
@@ -105,22 +116,26 @@ class PastorMapperTest {
         PastorRole childRole = PastorRole.builder().name("Associate Pastor").build();
         Pastor childPastor = new Pastor();
         childPastor.setId(2L);
-        childPastor.setFirstName("Jane");
-        childPastor.setLastName("Smith");
-        childPastor.setTel("456");
+        childPastor.setMember(Member.builder()
+                .firstName("Jane")
+                .lastName("Smith")
+                .tel("456")
+                .build());
         childPastor.setPastorRole(childRole);
 
         PastorRole leadRole = PastorRole.builder().name("Lead Pastor").build();
         Church church = Church.builder()
                 .id(1L)
                 .name("Main Church")
-                .pastors(new java.util.LinkedHashSet<>(Set.of(childPastor)))
+                .pastors(List.of(childPastor))
                 .build();
 
         Pastor pastor = Pastor.builder()
                 .id(1L)
-                .firstName("John")
-                .lastName("Doe")
+                .member(Member.builder()
+                        .firstName("John")
+                        .lastName("Doe")
+                        .build())
                 .pastorRole(leadRole)
                 .church(church)
                 .build();
@@ -141,8 +156,10 @@ class PastorMapperTest {
         PastorRole leadRole = PastorRole.builder().name("Lead Pastor").build();
         Pastor pastor = Pastor.builder()
                 .id(1L)
-                .firstName("John")
-                .lastName("Doe")
+                .member(Member.builder()
+                        .firstName("John")
+                        .lastName("Doe")
+                        .build())
                 .pastorRole(leadRole)
                 .church(church)
                 .build();
@@ -156,8 +173,10 @@ class PastorMapperTest {
     void shouldMapDTOToEntityWithIgnoredId() {
         PastorDTO dto = PastorDTO.builder()
                 .id(1L)
-                .firstName("John")
-                .lastName("Doe")
+                .memberDTO(MemberDTO.builder()
+                        .firstName("John")
+                        .lastName("Doe")
+                        .build())
                 .pastorRoleDTO(PastorRoleDTO.builder().name("Lead Pastor").build())
                 .build();
 
@@ -165,8 +184,8 @@ class PastorMapperTest {
 
         assertNotNull(pastor);
         assertNull(pastor.getId());
-        assertEquals("John", pastor.getFirstName());
-        assertEquals("Doe", pastor.getLastName());
+        assertEquals("John", pastor.getMember().getFirstName());
+        assertEquals("Doe", pastor.getMember().getLastName());
         assertNull(pastor.getPastorRole());
     }
 
@@ -182,8 +201,10 @@ class PastorMapperTest {
         PastorRole leadRole = PastorRole.builder().name("Lead Pastor").build();
         Pastor pastor = Pastor.builder()
                 .id(1L)
-                .firstName("John")
-                .lastName("Doe")
+                .member(Member.builder()
+                        .firstName("John")
+                        .lastName("Doe")
+                        .build())
                 .pastorRole(leadRole)
                 .build();
 
