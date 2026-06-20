@@ -65,7 +65,13 @@ public class MemberServiceImpl implements MemberService {
         savedMember.setLastName(member.getLastName());
         savedMember.setMiddleName(member.getMiddleName());
 
-        baptismRecordService.update(savedMember.getBaptismRecord().getId(), member.getBaptismRecord());
+        if (member.getBaptismRecord() != null) {
+            if (savedMember.getBaptismRecord() != null) {
+                baptismRecordService.update(savedMember.getBaptismRecord().getId(), member.getBaptismRecord());
+            } else {
+                    savedMember.setBaptismRecord(baptismRecordService.save(member.getBaptismRecord()));
+            }
+        }
         return memberRepository.save(savedMember);
     }
 

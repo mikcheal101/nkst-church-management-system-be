@@ -55,14 +55,9 @@ public class BaptismRecordServiceImpl implements BaptismRecordService {
         savedRecord.setSerialNumber(baptismRecord.getSerialNumber());
         savedRecord.setWorshipCenter(baptismRecord.getWorshipCenter());
 
-        try {
-            baptismRecordRepository.save(savedRecord);
-            log.info("Updated a Baptism Record with id: {}", id);
-            return savedRecord;
-        } catch (Exception exception) {
-            log.info("Update a Baptism Record with id: {}", id);
-            throw exception;
-        }
+        baptismRecordRepository.save(savedRecord);
+        log.info("Updated a Baptism Record with id: {}", id);
+        return savedRecord;
     }
 
     private BaptismRecord findById(Long id) throws IllegalArgumentException, ResourceNotFoundException {
