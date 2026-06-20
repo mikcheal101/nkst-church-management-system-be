@@ -131,4 +131,26 @@ class ChurchControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
+
+    @Test
+    void shouldGetSubChurches() throws Exception {
+        PageRequest pageRequest = PageRequest.of(0, 20);
+
+        ChurchResponse churchResponse = ChurchResponse.builder()
+                .id(1L)
+                .name("Church I")
+                .address("Church address")
+                .emailAddress("church@mail.com")
+                .build();
+
+        Page<ChurchResponse> page = new PageImpl<>(List.of(churchResponse));
+
+        when(churchService.getSubChurches(1L, pageRequest)).thenReturn(page);
+
+        mockMvc.perform(get("/api/v1/churches/sub-churches/1")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].name").value("Church I"));
+    }
 }

@@ -17,7 +17,7 @@ public class PastorMapper {
         return PastorDTO.builder()
                 .id(pastor.getId())
                 .memberDTO(MemberMapper.toDTO(pastor.getMember()))
-                .churchDTO(ChurchMapper.toDTO(pastor.getChurch()))
+                .churchDTO(ChurchMapper.toDTO(pastor.getChurch(), true))
                 .pastorRoleDTO(PastorRoleMapper.toDTO(pastor.getPastorRole()))
                 .build();
 
@@ -36,7 +36,7 @@ public class PastorMapper {
                 .emailAddress(pastor.getMember().getEmailAddress())
                 .gender(pastor.getMember().getGender().name())
                 .pastorRole(PastorRoleMapper.toDTO(pastor.getPastorRole()))
-                .church(ChurchMapper.toDTO(pastor.getChurch()))
+                .church(ChurchMapper.toDTO(pastor.getChurch(), true))
                 .build();
     }
 

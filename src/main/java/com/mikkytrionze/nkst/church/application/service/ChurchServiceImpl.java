@@ -104,6 +104,15 @@ public class ChurchServiceImpl implements ChurchService {
     }
 
     @Override
+    public Page<ChurchResponse> getSubChurches(Long id, Pageable pageable) {
+        log.info("Fetching all the sub churches for church with id: {},  with pagination: {}", id, pageable);
+
+        Page<Church> churchPage = churchRepository.findByParentChurchId(id, pageable);
+
+        return churchPage.map(ChurchMapper::toResponse);
+    }
+
+    @Override
     public Church findChurchById(Long id) {
         return churchRepository.findById(id).orElse(null);
     }

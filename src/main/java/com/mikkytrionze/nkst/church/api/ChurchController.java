@@ -54,4 +54,12 @@ public class ChurchController {
         this.churchService.deleteChurch(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/sub-churches/{id}")
+    public ResponseEntity<Page<ChurchResponse>> getSubChurches(
+            @PathVariable("id") Long id,
+            @PageableDefault(size = Constants.PAGE_SIZE) Pageable pageable) {
+        Page<ChurchResponse> subChurches = this.churchService.getSubChurches(id, pageable);
+        return ResponseEntity.ok(subChurches);
+    }
 }

@@ -12,14 +12,16 @@ import java.util.Objects;
 
 public class ChurchMapper {
 
-    public static ChurchDTO toDTO(Church church) {
+    public static ChurchDTO toDTO(Church church, boolean fetchChildren) {
         if (Objects.isNull(church)) {
             return null;
         }
 
-        List<ChurchDTO> subChurches = church.getSubChurches().stream()
-                .map(subChurch -> ChurchMapper.toDTO(subChurch))
-                .toList();
+        ChurchDTO parentChurch = ChurchMapper.toDTO(church.getParentChurch(), false);
+
+        List<ChurchDTO> subChurches = fetchChildren ? church.getSubChurches().stream()
+                .map(subChurch -> ChurchMapper.toDTO(subChurch, true))
+                .toList() : List.of();
 
         List<PastorDTO> pastors = church.getPastors().stream()
                 .map(pastor -> PastorMapper.toDTO(pastor))
@@ -31,7 +33,7 @@ public class ChurchMapper {
                 .address(church.getAddress())
                 .telNumber(church.getTelNumber())
                 .emailAddress(church.getEmailAddress())
-                .parentChurch(ChurchMapper.toDTO(church.getParentChurch()))
+                .parentChurch(parentChurch)
                 .pastors(pastors)
                 .subChurches(subChurches)
                 .build();
@@ -42,8 +44,14 @@ public class ChurchMapper {
             return null;
         }
 
+        ChurchDTO parentChurch = ChurchMapper.toDTO(church.getParentChurch(), false);
+
         List<PastorDTO> pastors = church.getPastors().stream()
                 .map(pastor -> PastorMapper.toDTO(pastor))
+                .toList();
+
+        List<ChurchDTO> subChurches = church.getSubChurches().stream()
+                .map(subChurch -> ChurchMapper.toDTO(subChurch, true))
                 .toList();
 
         return ChurchResponse.builder()
@@ -52,7 +60,8 @@ public class ChurchMapper {
                 .address(church.getAddress())
                 .telNumber(church.getTelNumber())
                 .emailAddress(church.getEmailAddress())
-                .parentChurch(ChurchMapper.toDTO(church.getParentChurch()))
+                .parentChurch(parentChurch)
+                .subChurches(subChurches)
                 .pastors(pastors)
                 .build();
     }
@@ -61,6 +70,8 @@ public class ChurchMapper {
         if (Objects.isNull(churchDTO)) {
             return null;
         }
+
+        Church parentCHurch = ChurchMapper.toEntity(churchDTO.getParentChurch());
 
         List<Pastor> pastors = churchDTO.getPastors().stream()
                 .map(pastor -> PastorMapper.toEntity(pastor))
@@ -71,7 +82,7 @@ public class ChurchMapper {
                 .toList();
 
         return Church.builder()
-                .parentChurch(ChurchMapper.toEntity(churchDTO.getParentChurch()))
+                .parentChurch(parentCHurch)
                 .name(churchDTO.getName())
                 .address(churchDTO.getAddress())
                 .telNumber(churchDTO.getTelNumber())

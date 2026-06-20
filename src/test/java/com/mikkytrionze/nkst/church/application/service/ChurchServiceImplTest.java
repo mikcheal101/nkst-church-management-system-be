@@ -347,4 +347,36 @@ class ChurchServiceImplTest {
 
         assertNull(churchService.findChurchById(99L));
     }
+
+    @Test
+    void shouldReturnAllSubChurches() {
+        Church parentChurch = Church.builder()
+                .id(1L)
+                .name("Main Church")
+                .address("Main Church Address")
+                .subChurches(List.of(
+                        Church.builder()
+                                .id(2L)
+                                .name("Church II")
+                                .address("Church II address")
+                                .build(),
+                        Church.builder()
+                                .id(3L)
+                                .name("Church III")
+                                .address("Church III address")
+                                .build()
+                ))
+                .build();
+
+        Page<Church> subChurchesPage = new PageImpl<>(parentChurch.getSubChurches());
+        PageRequest pageRequest = PageRequest.of(0, 20);
+
+        when(churchRepository.findByParentChurchId(1L, pageRequest)).thenReturn(subChurchesPage);
+
+        Page<ChurchResponse> response = churchService.getSubChurches(1L, pageRequest);
+
+        assertEquals(2L, response.getTotalElements());
+        assertNotNull(response);
+        assertEquals("Church II", response.getContent().getFirst().getName());
+    }
 }

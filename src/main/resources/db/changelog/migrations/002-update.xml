@@ -54,4 +54,13 @@
         <dropColumn tableName="pastors" columnName="middle_name"/>
         <dropColumn tableName="pastors" columnName="email_address"/>
     </changeSet>
+
+    <changeSet id="1781987728088" author="hemen.hirekaan">
+        <preConditions onError="MARK_RAN">
+            <tableExists tableName="pastors" />
+            <columnExists tableName="pastors" columnName="gender" />
+        </preConditions>
+
+        <dropColumn tableName="pastors" columnName="gender" />
+    </changeSet>
 </databaseChangeLog>

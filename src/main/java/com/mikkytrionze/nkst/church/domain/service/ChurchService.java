@@ -14,21 +14,28 @@ public interface ChurchService {
 
     /**
      * Retrieves a paginated view of all available churches.
-     * * @param pageable Pagination and sorting information (page number, size, sort).
+     * @param pageable Pagination and sorting information (page number, size, sort).
      * @return A {@link Page} of {@link ChurchResponse} objects.
      */
     Page<ChurchResponse> getChurches(Pageable pageable);
 
     /**
+     * Retrieves a paginated view of all available sub churches.
+     * @param pageable Pagination and sorting information (page number, size, sort).
+     * @return A {@link Page} of {@link ChurchResponse} objects.
+     */
+    Page<ChurchResponse> getSubChurches(Long id, Pageable pageable);
+
+    /**
      * Persists a new church record in the system.
-     * * @param churchRequest The DTO containing church registration details.
+     * @param churchRequest The DTO containing church registration details.
      * @return The created {@link ChurchResponse} including the generated ID.
      */
     ChurchResponse createChurch(ChurchRequest churchRequest);
 
     /**
      * Updates details of an existing church.
-     * * @param id The unique identifier of the church to update.
+     * @param id The unique identifier of the church to update.
      * @param churchRequest The DTO containing the updated church information.
      * @return The updated {@link ChurchResponse}.
      */

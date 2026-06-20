@@ -27,7 +27,7 @@ class ChurchMapperTest {
                 .address("123 Main St")
                 .build();
 
-        ChurchDTO dto = ChurchMapper.toDTO(church);
+        ChurchDTO dto = ChurchMapper.toDTO(church, true);
 
         assertNotNull(dto);
         assertEquals(1L, dto.getId());
@@ -69,7 +69,7 @@ class ChurchMapperTest {
 
     @Test
     void shouldReturnNullWhenChurchIsNull() {
-        assertNull(ChurchMapper.toDTO(null));
+        assertNull(ChurchMapper.toDTO(null, false));
         assertNull(ChurchMapper.toResponse(null));
         assertNull(ChurchMapper.toEntity(null));
     }
@@ -102,7 +102,7 @@ class ChurchMapperTest {
                 .pastors(List.of(pastor))
                 .build();
 
-        ChurchDTO dto = ChurchMapper.toDTO(church);
+        ChurchDTO dto = ChurchMapper.toDTO(church, true);
         assertNotNull(dto);
         assertNotNull(dto.getParentChurch());
         assertEquals("Parent Church", dto.getParentChurch().getName());
@@ -159,7 +159,7 @@ class ChurchMapperTest {
                 .pastors(List.of())
                 .build();
 
-        ChurchDTO dto = ChurchMapper.toDTO(church);
+        ChurchDTO dto = ChurchMapper.toDTO(church, true);
         assertNotNull(dto.getPastors());
         assertTrue(dto.getPastors().isEmpty());
     }
@@ -182,7 +182,7 @@ class ChurchMapperTest {
                 .pastors(List.of(pastor))
                 .build();
 
-        ChurchDTO dto = ChurchMapper.toDTO(church);
+        ChurchDTO dto = ChurchMapper.toDTO(church, true);
         assertNotNull(dto.getPastors());
         assertEquals(1, dto.getPastors().size());
         assertNull(dto.getPastors().stream().toList().getFirst().getPastorRoleDTO());
@@ -219,7 +219,7 @@ class ChurchMapperTest {
                         .name("Church")
                         .build();
 
-        ChurchDTO dto = ChurchMapper.toDTO(church);
+        ChurchDTO dto = ChurchMapper.toDTO(church, true);
         assertNotNull(dto);
         assertTrue(dto.getPastors().isEmpty());
     }

@@ -21,4 +21,5 @@ public class ChurchResponse {
     private String emailAddress;
     private ChurchDTO parentChurch;
     private List<PastorDTO> pastors;
+    private List<ChurchDTO> subChurches;
 }
