@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.mikkytrionze.nkst.member.domain.model.Member;
 import com.mikkytrionze.nkst.pastor.domain.model.Pastor;
 import com.mikkytrionze.nkst.pastor.domain.model.PastorRole;
+
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
@@ -97,7 +99,7 @@ class ChurchTest {
         church.addPastor(pastor2);
 
         assertEquals(2, church.getPastors().size());
-        assertTrue(church.getPastors().containsAll(Set.of(pastor1, pastor2)));
+        assertTrue(church.getPastors().containsAll(List.of(pastor1, pastor2)));
     }
 
     @Test

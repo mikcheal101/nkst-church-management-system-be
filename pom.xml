@@ -258,6 +258,9 @@
 				</executions>
 				<configuration>
 					<proc>full</proc>
+					<compilerArgs>
+						<arg>-parameters</arg>
+					</compilerArgs>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.projectlombok</groupId>

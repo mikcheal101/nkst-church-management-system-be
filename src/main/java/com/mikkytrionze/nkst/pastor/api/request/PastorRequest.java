@@ -1,6 +1,7 @@
 package com.mikkytrionze.nkst.pastor.api.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,10 +37,10 @@ public class PastorRequest {
     private String emailAddress;
 
     // -> Baptism Record
-    @NotBlank(message = "Serial Number is required!")
+    @NotNull(message = "Serial Number is required!")
     private Integer serialNumber;
 
-    @NotBlank(message = "Date of baptism is required!")
+    @NotNull(message = "Date of baptism is required!")
     private Instant dateOfBaptism;
 
     @NotBlank(message = "Worship center is required!")

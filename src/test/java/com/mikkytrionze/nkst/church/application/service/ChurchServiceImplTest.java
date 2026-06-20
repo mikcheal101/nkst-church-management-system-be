@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 
 import com.mikkytrionze.nkst.church.api.request.ChurchRequest;
 import com.mikkytrionze.nkst.church.api.response.ChurchResponse;
-import com.mikkytrionze.nkst.church.application.mapper.ChurchMapper;
 import com.mikkytrionze.nkst.church.domain.model.Church;
 import com.mikkytrionze.nkst.church.domain.repository.ChurchRepository;
 import com.mikkytrionze.nkst.shared.exception.ResourceNotFoundException;
@@ -26,9 +25,6 @@ import org.springframework.data.domain.PageRequest;
 class ChurchServiceImplTest {
 
     @Mock
-    private ChurchMapper ChurchMapper;
-
-    @Mock
     private ChurchRepository churchRepository;
 
     private ChurchServiceImpl churchService;
@@ -40,17 +36,16 @@ class ChurchServiceImplTest {
 
     @Test
     void shouldGetChurchById() {
-        Church church = Church.builder().id(1L).name("Main Church").build();
-        ChurchResponse response = ChurchResponse.builder().id(1L).name("Main Church").build();
+        String mainChurch = "Main Church";
+        Church church = Church.builder().id(1L).name(mainChurch).build();
 
         when(churchRepository.findById(1L)).thenReturn(Optional.of(church));
-        when(ChurchMapper.toResponse(church)).thenReturn(response);
 
         ChurchResponse result = churchService.getChurch(1L);
 
         assertNotNull(result);
         assertEquals(1L, result.getId());
-        assertEquals("Main Church", result.getName());
+        assertEquals(mainChurch, result.getName());
     }
 
     @Test
@@ -62,19 +57,21 @@ class ChurchServiceImplTest {
 
     @Test
     void shouldGetAllChurches() {
-        Church church = Church.builder().id(1L).name("Main Church").build();
-        ChurchResponse response = ChurchResponse.builder().id(1L).name("Main Church").build();
+        String mainChurch = "Main Church";
+        Church church = Church.builder()
+                .id(1L)
+                .name(mainChurch)
+                .build();
         PageRequest pageable = PageRequest.of(0, 20);
         Page<Church> churchPage = new PageImpl<>(List.of(church));
 
         when(churchRepository.findAll(pageable)).thenReturn(churchPage);
-        when(ChurchMapper.toResponse(church)).thenReturn(response);
 
         Page<ChurchResponse> result = churchService.getChurches(pageable);
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        assertEquals("Main Church", result.getContent().getFirst().getName());
+        assertEquals(mainChurch, result.getContent().getFirst().getName());
     }
 
     @Test
@@ -84,31 +81,19 @@ class ChurchServiceImplTest {
                 .address("456 Oak St")
                 .build();
 
-        Church church = Church.builder()
-                .name("New Church")
-                .address("456 Oak St")
-                .build();
-
         Church savedChurch = Church.builder()
                 .id(1L)
-                .name("New Church")
-                .address("456 Oak St")
-                .build();
-
-        ChurchResponse response = ChurchResponse.builder()
-                .id(1L)
-                .name("New Church")
+                .name("NEW CHURCH")
                 .address("456 Oak St")
                 .build();
 
         when(churchRepository.save(any(Church.class))).thenReturn(savedChurch);
-        when(ChurchMapper.toResponse(savedChurch)).thenReturn(response);
 
         ChurchResponse result = churchService.createChurch(request);
 
         assertNotNull(result);
         assertEquals(1L, result.getId());
-        assertEquals("New Church", result.getName());
+        assertEquals("NEW CHURCH", result.getName());
         assertEquals("456 Oak St", result.getAddress());
     }
 
@@ -121,28 +106,15 @@ class ChurchServiceImplTest {
                 .build();
 
         Church parentChurch = Church.builder().id(1L).name("Parent Church").build();
-        Church church = Church.builder()
-                .name("Child Church")
-                .address("789 Pine St")
-                .parentChurch(parentChurch)
-                .build();
-
         Church savedChurch = Church.builder()
                 .id(2L)
-                .name("Child Church")
+                .name("CHILD CHURCH")
                 .address("789 Pine St")
                 .parentChurch(parentChurch)
-                .build();
-
-        ChurchResponse response = ChurchResponse.builder()
-                .id(2L)
-                .name("Child Church")
-                .address("789 Pine St")
                 .build();
 
         when(churchRepository.findById(1L)).thenReturn(Optional.of(parentChurch));
         when(churchRepository.save(any(Church.class))).thenReturn(savedChurch);
-        when(ChurchMapper.toResponse(savedChurch)).thenReturn(response);
 
         ChurchResponse result = churchService.createChurch(request);
 
@@ -160,31 +132,24 @@ class ChurchServiceImplTest {
 
         Church existingChurch = Church.builder()
                 .id(churchId)
-                .name("Old Church")
+                .name("OLD CHURCH")
                 .address("Old Address")
                 .build();
 
         Church updatedChurch = Church.builder()
                 .id(churchId)
-                .name("Updated Church")
-                .address("321 New St")
-                .build();
-
-        ChurchResponse response = ChurchResponse.builder()
-                .id(churchId)
-                .name("Updated Church")
+                .name("UPDATED CHURCH")
                 .address("321 New St")
                 .build();
 
         when(churchRepository.findById(churchId)).thenReturn(Optional.of(existingChurch));
         when(churchRepository.existsByName("Updated Church")).thenReturn(false);
         when(churchRepository.save(any(Church.class))).thenReturn(updatedChurch);
-        when(ChurchMapper.toResponse(updatedChurch)).thenReturn(response);
 
         ChurchResponse result = churchService.updateChurch(churchId, request);
 
         assertNotNull(result);
-        assertEquals("Updated Church", result.getName());
+        assertEquals("UPDATED CHURCH", result.getName());
         assertEquals("321 New St", result.getAddress());
     }
 
@@ -198,7 +163,7 @@ class ChurchServiceImplTest {
 
         Church existingChurch = Church.builder()
                 .id(churchId)
-                .name("Old Church")
+                .name("OLD CHURCH")
                 .address("Old Addr")
                 .build();
 
@@ -219,30 +184,23 @@ class ChurchServiceImplTest {
 
         Church existingChurch = Church.builder()
                 .id(churchId)
-                .name("Same Church")
+                .name("SAME CHURCH")
                 .address("Old Address")
                 .build();
 
         Church updatedChurch = Church.builder()
                 .id(churchId)
-                .name("Same Church")
-                .address("New Address")
-                .build();
-
-        ChurchResponse response = ChurchResponse.builder()
-                .id(churchId)
-                .name("Same Church")
+                .name("SAME CHURCH")
                 .address("New Address")
                 .build();
 
         when(churchRepository.findById(churchId)).thenReturn(Optional.of(existingChurch));
         when(churchRepository.save(any(Church.class))).thenReturn(updatedChurch);
-        when(ChurchMapper.toResponse(updatedChurch)).thenReturn(response);
 
         ChurchResponse result = churchService.updateChurch(churchId, request);
 
         assertNotNull(result);
-        assertEquals("Same Church", result.getName());
+        assertEquals("SAME CHURCH", result.getName());
         assertEquals("New Address", result.getAddress());
     }
 
@@ -260,34 +218,27 @@ class ChurchServiceImplTest {
         Church existingParent = Church.builder().id(10L).name("Old Parent").build();
         Church existingChurch = Church.builder()
                 .id(churchId)
-                .name("Old Church")
+                .name("OLD CHURCH")
                 .address("Old Address")
                 .parentChurch(existingParent)
                 .build();
 
         Church updatedChurch = Church.builder()
                 .id(churchId)
-                .name("Updated Church")
+                .name("UPDATED CHURCH")
                 .address("321 New St")
                 .parentChurch(parent)
-                .build();
-
-        ChurchResponse response = ChurchResponse.builder()
-                .id(churchId)
-                .name("Updated Church")
-                .address("321 New St")
                 .build();
 
         when(churchRepository.findById(churchId)).thenReturn(Optional.of(existingChurch));
         when(churchRepository.findById(newParentId)).thenReturn(Optional.of(parent));
         when(churchRepository.existsByName("Updated Church")).thenReturn(false);
         when(churchRepository.save(any(Church.class))).thenReturn(updatedChurch);
-        when(ChurchMapper.toResponse(updatedChurch)).thenReturn(response);
 
         ChurchResponse result = churchService.updateChurch(churchId, request);
 
         assertNotNull(result);
-        assertEquals("Updated Church", result.getName());
+        assertEquals("UPDATED CHURCH", result.getName());
     }
 
     @Test
@@ -303,33 +254,26 @@ class ChurchServiceImplTest {
 
         Church existingChurch = Church.builder()
                 .id(churchId)
-                .name("Old Church")
+                .name("OLD CHURCH")
                 .address("Old Address")
                 .parentChurch(parent)
                 .build();
 
         Church updatedChurch = Church.builder()
                 .id(churchId)
-                .name("Updated Church")
+                .name("UPDATED CHURCH")
                 .address("321 New St")
                 .parentChurch(parent)
-                .build();
-
-        ChurchResponse response = ChurchResponse.builder()
-                .id(churchId)
-                .name("Updated Church")
-                .address("321 New St")
                 .build();
 
         when(churchRepository.findById(churchId)).thenReturn(Optional.of(existingChurch));
         when(churchRepository.existsByName("Updated Church")).thenReturn(false);
         when(churchRepository.save(any(Church.class))).thenReturn(updatedChurch);
-        when(ChurchMapper.toResponse(updatedChurch)).thenReturn(response);
 
         ChurchResponse result = churchService.updateChurch(churchId, request);
 
         assertNotNull(result);
-        assertEquals("Updated Church", result.getName());
+        assertEquals("UPDATED CHURCH", result.getName());
     }
 
     @Test
@@ -343,33 +287,26 @@ class ChurchServiceImplTest {
 
         Church existingChurch = Church.builder()
                 .id(churchId)
-                .name("Old Church")
+                .name("OLD CHURCH")
                 .address("Old Address")
                 .parentChurch(parent)
                 .build();
 
         Church updatedChurch = Church.builder()
                 .id(churchId)
-                .name("Updated Church")
+                .name("UPDATED CHURCH")
                 .address("321 New St")
                 .parentChurch(parent)
-                .build();
-
-        ChurchResponse response = ChurchResponse.builder()
-                .id(churchId)
-                .name("Updated Church")
-                .address("321 New St")
                 .build();
 
         when(churchRepository.findById(churchId)).thenReturn(Optional.of(existingChurch));
         when(churchRepository.existsByName("Updated Church")).thenReturn(false);
         when(churchRepository.save(any(Church.class))).thenReturn(updatedChurch);
-        when(ChurchMapper.toResponse(updatedChurch)).thenReturn(response);
 
         ChurchResponse result = churchService.updateChurch(churchId, request);
 
         assertNotNull(result);
-        assertEquals("Updated Church", result.getName());
+        assertEquals("UPDATED CHURCH", result.getName());
     }
 
     @Test

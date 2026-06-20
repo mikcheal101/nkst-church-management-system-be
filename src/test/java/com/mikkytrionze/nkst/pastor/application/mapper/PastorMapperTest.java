@@ -14,11 +14,8 @@ import com.mikkytrionze.nkst.pastor.domain.model.PastorRole;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
 
 class PastorMapperTest {
-
-    private final PastorMapper mapper = Mappers.getMapper(PastorMapper.class);
 
     @Test
     void shouldMapPastorToDTO() {
@@ -34,7 +31,7 @@ class PastorMapperTest {
                 .pastorRole(pastorRole)
                 .build();
 
-        PastorDTO dto = mapper.toDTO(pastor);
+        PastorDTO dto = PastorMapper.toDTO(pastor);
 
         assertNotNull(dto);
         assertEquals(1L, dto.getId());
@@ -56,7 +53,7 @@ class PastorMapperTest {
                 .pastorRole(null)
                 .build();
 
-        PastorDTO dto = mapper.toDTO(pastor);
+        PastorDTO dto = PastorMapper.toDTO(pastor);
         assertNotNull(dto);
         assertNull(dto.getPastorRoleDTO());
     }
@@ -80,7 +77,7 @@ class PastorMapperTest {
                 .church(church)
                 .build();
 
-        PastorResponse response = mapper.toResponse(pastor);
+        PastorResponse response = PastorMapper.toResponse(pastor);
 
         assertNotNull(response);
         assertEquals(1L, response.getId());
@@ -106,7 +103,7 @@ class PastorMapperTest {
                 .pastorRole(null)
                 .build();
 
-        PastorResponse response = mapper.toResponse(pastor);
+        PastorResponse response = PastorMapper.toResponse(pastor);
         assertNotNull(response);
         assertNull(response.getPastorRole());
     }
@@ -140,7 +137,7 @@ class PastorMapperTest {
                 .church(church)
                 .build();
 
-        PastorResponse response = mapper.toResponse(pastor);
+        PastorResponse response = PastorMapper.toResponse(pastor);
         assertNotNull(response.getChurch());
         assertNotNull(response.getChurch().getPastors());
         assertEquals(1, response.getChurch().getPastors().size());
@@ -148,10 +145,10 @@ class PastorMapperTest {
 
     @Test
     void shouldMapPastorToResponseWithChurchHavingNullPastors() {
-        Church church = new Church();
-        church.setId(1L);
-        church.setName("Main Church");
-        church.setPastors(null);
+        Church church = Church.builder()
+                .id(1L)
+                .name("Main Church")
+                .build();
 
         PastorRole leadRole = PastorRole.builder().name("Lead Pastor").build();
         Pastor pastor = Pastor.builder()
@@ -164,9 +161,9 @@ class PastorMapperTest {
                 .church(church)
                 .build();
 
-        PastorResponse response = mapper.toResponse(pastor);
+        PastorResponse response = PastorMapper.toResponse(pastor);
         assertNotNull(response.getChurch());
-        assertNull(response.getChurch().getPastors());
+        assertTrue(response.getChurch().getPastors().isEmpty());
     }
 
     @Test
@@ -180,20 +177,20 @@ class PastorMapperTest {
                 .pastorRoleDTO(PastorRoleDTO.builder().name("Lead Pastor").build())
                 .build();
 
-        Pastor pastor = mapper.toEntity(dto);
+        Pastor pastor = PastorMapper.toEntity(dto);
 
         assertNotNull(pastor);
-        assertNull(pastor.getId());
+        assertNotNull(pastor.getId());
         assertEquals("John", pastor.getMember().getFirstName());
         assertEquals("Doe", pastor.getMember().getLastName());
-        assertNull(pastor.getPastorRole());
+        assertNotNull(pastor.getPastorRole());
     }
 
     @Test
     void shouldReturnNullWhenPastorIsNull() {
-        assertNull(mapper.toDTO(null));
-        assertNull(mapper.toResponse(null));
-        assertNull(mapper.toEntity(null));
+        assertNull(PastorMapper.toDTO(null));
+        assertNull(PastorMapper.toResponse(null));
+        assertNull(PastorMapper.toEntity(null));
     }
 
     @Test
@@ -208,7 +205,7 @@ class PastorMapperTest {
                 .pastorRole(leadRole)
                 .build();
 
-        PastorResponse response = mapper.toResponse(pastor);
+        PastorResponse response = PastorMapper.toResponse(pastor);
         assertNull(response.getChurch());
     }
 }
