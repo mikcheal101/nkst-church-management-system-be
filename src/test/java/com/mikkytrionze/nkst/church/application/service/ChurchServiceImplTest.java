@@ -56,6 +56,11 @@ class ChurchServiceImplTest {
     }
 
     @Test
+    void shouldThrowExceptionWhenGetChurchWithNullId() {
+        assertThrows(IllegalArgumentException.class, () -> churchService.getChurch(null));
+    }
+
+    @Test
     void shouldGetAllChurches() {
         String mainChurch = "Main Church";
         Church church = Church.builder()

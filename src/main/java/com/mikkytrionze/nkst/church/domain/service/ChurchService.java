@@ -43,14 +43,14 @@ public interface ChurchService {
 
     /**
      * Fetches details for a specific church.
-     * * @param id The unique identifier of the target church.
+     * @param id The unique identifier of the target church.
      * @return The {@link ChurchResponse} matching the requested ID.
      */
     ChurchResponse getChurch(Long id);
 
     /**
      * Internal utility to retrieve a domain entity.
-     * * @param id The unique identifier of the church.
+     * @param id The unique identifier of the church.
      * @return The raw {@link Church} domain entity.
      * @throws ResourceNotFoundException if the entity does not exist.
      */
@@ -58,7 +58,7 @@ public interface ChurchService {
 
     /**
      * Removes a church record from the system (Soft delete).
-     * * @param id The unique identifier of the church to be deleted.
+     * @param id The unique identifier of the church to be deleted.
      */
     void deleteChurch(Long id);
 }

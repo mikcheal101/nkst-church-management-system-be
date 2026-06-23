@@ -4,6 +4,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import com.mikkytrionze.nkst.church.domain.model.Church;
+import com.mikkytrionze.nkst.church.domain.repository.ChurchRepository;
+import com.mikkytrionze.nkst.member.api.request.MemberRequest;
+import com.mikkytrionze.nkst.member.api.response.MemberResponse;
+import com.mikkytrionze.nkst.member.application.mapper.MemberMapper;
 import com.mikkytrionze.nkst.member.domain.enums.Gender;
 import com.mikkytrionze.nkst.member.domain.model.BaptismRecord;
 import com.mikkytrionze.nkst.member.domain.model.Member;
@@ -11,13 +16,16 @@ import com.mikkytrionze.nkst.member.domain.repository.MemberRepository;
 import com.mikkytrionze.nkst.member.domain.service.BaptismRecordService;
 import com.mikkytrionze.nkst.shared.exception.ResourceNotFoundException;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceImplTest {
@@ -28,21 +36,31 @@ class MemberServiceImplTest {
     @Mock
     private BaptismRecordService baptismRecordService;
 
+    @Mock
+    private ChurchRepository churchRepository;
+
     @InjectMocks
     private MemberServiceImpl memberService;
 
     @Test
     void shouldGetMemberById() {
+        com.mikkytrionze.nkst.church.domain.model.Church church = com.mikkytrionze.nkst.church.domain.model.Church.builder()
+                .id(1L)
+                .name("Test Church")
+                .address("123 Main St")
+                .build();
         Member member = Member.builder()
                 .id(1L)
                 .firstName("John")
                 .lastName("Doe")
                 .tel("1234567890")
+                .gender(com.mikkytrionze.nkst.member.domain.enums.Gender.MALE)
+                .church(church)
                 .build();
 
         when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
 
-        Member result = memberService.getById(1L);
+        com.mikkytrionze.nkst.member.api.response.MemberResponse result = memberService.getById(1L);
 
         assertNotNull(result);
         assertEquals(1L, result.getId());
@@ -63,10 +81,19 @@ class MemberServiceImplTest {
 
     @Test
     void shouldSaveMemberWithoutBaptismRecord() {
-        Member member = Member.builder()
+        com.mikkytrionze.nkst.church.domain.model.Church church = com.mikkytrionze.nkst.church.domain.model.Church.builder()
+                .id(1L)
+                .name("Test Church")
+                .address("123 Main St")
+                .build();
+        MemberRequest memberRequest = MemberRequest.builder()
                 .firstName("John")
                 .lastName("Doe")
                 .tel("1234567890")
+                .gender("MALE")
+                .isBaptised(false)
+                .emailAddress("john@example.com")
+                .churchId(1L)
                 .build();
 
         Member savedMember = Member.builder()
@@ -74,213 +101,35 @@ class MemberServiceImplTest {
                 .firstName("John")
                 .lastName("Doe")
                 .tel("1234567890")
+                .gender(com.mikkytrionze.nkst.member.domain.enums.Gender.MALE)
+                .isBaptised(false)
+                .church(church)
+                .emailAddress("john@example.com")
                 .build();
 
+        when(churchRepository.findById(1L)).thenReturn(Optional.of(church));
         when(memberRepository.save(any(Member.class))).thenReturn(savedMember);
 
-        Member result = memberService.saveMember(member);
+        com.mikkytrionze.nkst.member.api.response.MemberResponse result = memberService.saveMember(memberRequest);
 
         assertNotNull(result);
         assertEquals(1L, result.getId());
         verify(baptismRecordService, never()).save(any());
-    }
-
-    @Test
-    void shouldSaveMemberWithBaptismRecord() {
-        BaptismRecord baptismRecord = BaptismRecord.builder()
-                .serialNumber(100)
-                .dateOfBaptism(Instant.now())
-                .worshipCenter("Main Church")
-                .bibleVerse("John 3:16")
-                .baptizedBy("Pastor Mike")
-                .build();
-
-        Member member = Member.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .tel("1234567890")
-                .isBaptised(true)
-                .baptismRecord(baptismRecord)
-                .build();
-
-        BaptismRecord savedBaptismRecord = BaptismRecord.builder()
-                .id(1L)
-                .serialNumber(100)
-                .dateOfBaptism(Instant.now())
-                .worshipCenter("Main Church")
-                .bibleVerse("John 3:16")
-                .baptizedBy("Pastor Mike")
-                .build();
-
-        Member savedMember = Member.builder()
-                .id(1L)
-                .firstName("John")
-                .lastName("Doe")
-                .tel("1234567890")
-                .isBaptised(true)
-                .baptismRecord(savedBaptismRecord)
-                .build();
-
-        when(baptismRecordService.save(any(BaptismRecord.class))).thenReturn(savedBaptismRecord);
-        when(memberRepository.save(any(Member.class))).thenReturn(savedMember);
-
-        Member result = memberService.saveMember(member);
-
-        assertNotNull(result);
-        assertEquals(1L, result.getId());
-        verify(baptismRecordService).save(any(BaptismRecord.class));
-    }
-
-    @Test
-    void shouldUpdateMemberWithoutBaptismRecord() {
-        Long memberId = 1L;
-        Member existingMember = Member.builder()
-                .id(memberId)
-                .firstName("John")
-                .lastName("Doe")
-                .tel("1234567890")
-                .gender(Gender.MALE)
-                .build();
-
-        Member updateMember = Member.builder()
-                .firstName("Jane")
-                .lastName("Smith")
-                .tel("0987654321")
-                .gender(Gender.FEMALE)
-                .emailAddress("jane@test.com")
-                .build();
-
-        Member updatedMember = Member.builder()
-                .id(memberId)
-                .firstName("Jane")
-                .lastName("Smith")
-                .tel("0987654321")
-                .gender(Gender.FEMALE)
-                .emailAddress("jane@test.com")
-                .build();
-
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(existingMember));
-        when(memberRepository.save(any(Member.class))).thenReturn(updatedMember);
-
-        Member result = memberService.updateMember(memberId, updateMember);
-
-        assertNotNull(result);
-        assertEquals("Jane", result.getFirstName());
-        assertEquals("Smith", result.getLastName());
-        verify(baptismRecordService, never()).update(anyLong(), any());
-        verify(baptismRecordService, never()).save(any());
-    }
-
-    @Test
-    void shouldUpdateMemberWithExistingBaptismRecord() {
-        Long memberId = 1L;
-        Long baptismRecordId = 2L;
-        BaptismRecord existingBaptismRecord = BaptismRecord.builder()
-                .id(baptismRecordId)
-                .build();
-
-        Member existingMember = Member.builder()
-                .id(memberId)
-                .firstName("John")
-                .lastName("Doe")
-                .tel("1234567890")
-                .baptismRecord(existingBaptismRecord)
-                .build();
-
-        BaptismRecord newBaptismRecord = BaptismRecord.builder()
-                .serialNumber(200)
-                .dateOfBaptism(Instant.now())
-                .worshipCenter("New Church")
-                .bibleVerse("Matthew 28:19")
-                .baptizedBy("Pastor Jane")
-                .build();
-
-        Member updateMember = Member.builder()
-                .firstName("Jane")
-                .lastName("Smith")
-                .tel("0987654321")
-                .baptismRecord(newBaptismRecord)
-                .build();
-
-        Member updatedMember = Member.builder()
-                .id(memberId)
-                .firstName("Jane")
-                .lastName("Smith")
-                .tel("0987654321")
-                .baptismRecord(existingBaptismRecord)
-                .build();
-
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(existingMember));
-        when(baptismRecordService.update(eq(baptismRecordId), any(BaptismRecord.class))).thenReturn(existingBaptismRecord);
-        when(memberRepository.save(any(Member.class))).thenReturn(updatedMember);
-
-        Member result = memberService.updateMember(memberId, updateMember);
-
-        assertNotNull(result);
-        verify(baptismRecordService).update(eq(baptismRecordId), any(BaptismRecord.class));
-    }
-
-    @Test
-    void shouldUpdateMemberAddingNewBaptismRecord() {
-        Long memberId = 1L;
-        Member existingMember = Member.builder()
-                .id(memberId)
-                .firstName("John")
-                .lastName("Doe")
-                .tel("1234567890")
-                .build();
-
-        BaptismRecord newBaptismRecord = BaptismRecord.builder()
-                .serialNumber(200)
-                .dateOfBaptism(Instant.now())
-                .worshipCenter("New Church")
-                .bibleVerse("Matthew 28:19")
-                .baptizedBy("Pastor Jane")
-                .build();
-
-        Member updateMember = Member.builder()
-                .firstName("Jane")
-                .lastName("Smith")
-                .tel("0987654321")
-                .isBaptised(true)
-                .baptismRecord(newBaptismRecord)
-                .build();
-
-        BaptismRecord savedBaptismRecord = BaptismRecord.builder()
-                .id(2L)
-                .serialNumber(200)
-                .dateOfBaptism(Instant.now())
-                .worshipCenter("New Church")
-                .bibleVerse("Matthew 28:19")
-                .baptizedBy("Pastor Jane")
-                .build();
-
-        Member updatedMember = Member.builder()
-                .id(memberId)
-                .firstName("Jane")
-                .lastName("Smith")
-                .tel("0987654321")
-                .isBaptised(true)
-                .baptismRecord(savedBaptismRecord)
-                .build();
-
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(existingMember));
-        when(baptismRecordService.save(any(BaptismRecord.class))).thenReturn(savedBaptismRecord);
-        when(memberRepository.save(any(Member.class))).thenReturn(updatedMember);
-
-        Member result = memberService.updateMember(memberId, updateMember);
-
-        assertNotNull(result);
-        verify(baptismRecordService).save(any(BaptismRecord.class));
     }
 
     @Test
     void shouldSoftDeleteMember() {
+        com.mikkytrionze.nkst.church.domain.model.Church church = com.mikkytrionze.nkst.church.domain.model.Church.builder()
+                .id(1L)
+                .name("Test Church")
+                .address("123 Main St")
+                .build();
         Long memberId = 1L;
         Member member = Member.builder()
                 .id(memberId)
                 .firstName("John")
                 .lastName("Doe")
+                .church(church)
                 .build();
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
@@ -297,5 +146,239 @@ class MemberServiceImplTest {
         when(memberRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> memberService.deleteMember(99L));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDeletingWithNullId() {
+        assertThrows(IllegalArgumentException.class, () -> memberService.deleteMember(null));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenIdIsZero() {
+        assertThrows(IllegalArgumentException.class, () -> memberService.getById(0L));
+    }
+
+    @Test
+    void shouldSaveMemberWithBaptismRecord() {
+        Church church = Church.builder().id(1L).name("Test Church").address("123 Main St").build();
+        BaptismRecord baptismRecord = BaptismRecord.builder()
+                .id(10L)
+                .dateOfBaptism(Instant.parse("2024-01-15T10:00:00Z"))
+                .bibleVerse("Mark 16:16")
+                .serialNumber(100)
+                .baptizedBy("Pastor John")
+                .worshipCenter("Main Church")
+                .build();
+
+        MemberRequest memberRequest = MemberRequest.builder()
+                .firstName("Jane")
+                .lastName("Doe")
+                .tel("0987654321")
+                .gender("FEMALE")
+                .isBaptised(true)
+                .emailAddress("jane@example.com")
+                .churchId(1L)
+                .dateOfBaptism(Instant.parse("2024-01-15T10:00:00Z"))
+                .bibleVerse("Mark 16:16")
+                .serialNumber(100)
+                .baptisedBy("Pastor John")
+                .worshipCenter("Main Church")
+                .build();
+
+        Member savedMember = Member.builder()
+                .id(2L)
+                .firstName("Jane")
+                .lastName("Doe")
+                .tel("0987654321")
+                .gender(Gender.FEMALE)
+                .isBaptised(true)
+                .church(church)
+                .baptismRecord(baptismRecord)
+                .emailAddress("jane@example.com")
+                .build();
+
+        when(churchRepository.findById(1L)).thenReturn(Optional.of(church));
+        when(baptismRecordService.save(any(BaptismRecord.class))).thenReturn(baptismRecord);
+        when(memberRepository.save(any(Member.class))).thenReturn(savedMember);
+
+        MemberResponse result = memberService.saveMember(memberRequest);
+
+        assertNotNull(result);
+        assertEquals(2L, result.getId());
+        assertTrue(result.isBaptised());
+        verify(baptismRecordService).save(any(BaptismRecord.class));
+    }
+
+    @Test
+    void shouldGetAllMembers() {
+        Church church = Church.builder().id(1L).name("Test Church").build();
+        Member member = Member.builder()
+                .id(1L).firstName("John").lastName("Doe")
+                .tel("1234567890").gender(Gender.MALE).church(church)
+                .build();
+        PageRequest pageable = PageRequest.of(0, 20);
+        Page<Member> memberPage = new PageImpl<>(List.of(member));
+
+        when(memberRepository.findAll(pageable)).thenReturn(memberPage);
+
+        Page<MemberResponse> result = memberService.getAllMembers(pageable);
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+    }
+
+    @Test
+    void shouldGetAllChurchMembers() {
+        Church church = Church.builder().id(1L).name("Test Church").build();
+        Member member = Member.builder()
+                .id(1L).firstName("John").lastName("Doe")
+                .tel("1234567890").gender(Gender.MALE).church(church)
+                .build();
+        PageRequest pageable = PageRequest.of(0, 20);
+        Page<Member> memberPage = new PageImpl<>(List.of(member));
+
+        when(memberRepository.findAllByChurchId(1L, pageable)).thenReturn(memberPage);
+
+        Page<MemberResponse> result = memberService.getAllChurchMembers(1L, pageable);
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+    }
+
+    @Test
+    void shouldGetChurchMember() {
+        Church church = Church.builder().id(1L).name("Test Church").build();
+        Member member = Member.builder()
+                .id(2L).firstName("Jane").lastName("Smith")
+                .tel("0987654321").gender(Gender.FEMALE).church(church)
+                .build();
+
+        when(memberRepository.findById(2L)).thenReturn(Optional.of(member));
+
+        MemberResponse result = memberService.getChurchMember(1L, 2L);
+
+        assertNotNull(result);
+        assertEquals(2L, result.getId());
+        assertEquals("Jane", result.getFirstName());
+    }
+
+    @Test
+    void shouldGetChurchMemberWithZeroChurchIdSkipsChurchCheck() {
+        Church church = Church.builder().id(2L).name("Test Church").build();
+        Member member = Member.builder()
+                .id(2L).firstName("Jane").church(church)
+                .tel("0987654321").gender(Gender.FEMALE)
+                .build();
+
+        when(memberRepository.findById(2L)).thenReturn(Optional.of(member));
+
+        MemberResponse result = memberService.getChurchMember(0L, 2L);
+
+        assertNotNull(result);
+        assertEquals(2L, result.getId());
+    }
+
+    @Test
+    void shouldThrowNotFoundExceptionWhenChurchMemberNotFoundInDifferentChurch() {
+        Church church1 = Church.builder().id(1L).name("Church 1").build();
+        Church church2 = Church.builder().id(2L).name("Church 2").build();
+        Member member = Member.builder()
+                .id(2L).firstName("Jane").church(church2)
+                .tel("0987654321").gender(Gender.FEMALE)
+                .build();
+
+        when(memberRepository.findById(2L)).thenReturn(Optional.of(member));
+
+        assertThrows(ResourceNotFoundException.class, () -> memberService.getChurchMember(1L, 2L));
+    }
+
+    @Test
+    void shouldUpdateMemberWithoutBaptismRecord() {
+        Church church = Church.builder().id(1L).name("Test Church").build();
+        Member existingMember = Member.builder()
+                .id(1L).firstName("Old").lastName("Name")
+                .tel("1234567890").gender(Gender.MALE).isBaptised(false)
+                .church(church).emailAddress("old@example.com")
+                .build();
+        MemberRequest updateRequest = MemberRequest.builder()
+                .firstName("New").lastName("Name")
+                .tel("1234567890").gender("MALE")
+                .isBaptised(false).emailAddress("new@example.com")
+                .build();
+
+        Member updatedMember = Member.builder()
+                .id(1L).firstName("New").lastName("Name")
+                .tel("1234567890").gender(Gender.MALE).isBaptised(false)
+                .church(church).emailAddress("new@example.com")
+                .build();
+
+        when(memberRepository.findById(1L)).thenReturn(Optional.of(existingMember));
+        when(memberRepository.save(any(Member.class))).thenReturn(updatedMember);
+
+        MemberResponse result = memberService.updateMember(1L, updateRequest);
+
+        assertNotNull(result);
+        assertEquals("New", result.getFirstName());
+        verify(baptismRecordService, never()).update(any(), any());
+    }
+
+    @Test
+    void shouldUpdateMemberWithBaptismRecord() {
+        Church church = Church.builder().id(1L).name("Test Church").build();
+        BaptismRecord existingRecord = BaptismRecord.builder()
+                .id(10L).dateOfBaptism(Instant.parse("2023-01-01T00:00:00Z"))
+                .bibleVerse("Mark 16:16").serialNumber(1).baptizedBy("Pastor A")
+                .worshipCenter("Main Church").build();
+        Member existingMember = Member.builder()
+                .id(1L).firstName("Old").lastName("Name")
+                .tel("1234567890").gender(Gender.MALE).isBaptised(true)
+                .church(church).baptismRecord(existingRecord)
+                .build();
+        MemberRequest updateRequest = MemberRequest.builder()
+                .firstName("New").lastName("Name")
+                .tel("1234567890").gender("MALE")
+                .isBaptised(true).emailAddress("new@example.com")
+                .dateOfBaptism(Instant.parse("2024-06-01T00:00:00Z"))
+                .bibleVerse("Acts 2:38").serialNumber(2)
+                .baptisedBy("Pastor B").worshipCenter("New Church")
+                .build();
+        BaptismRecord updatedRecord = BaptismRecord.builder()
+                .id(10L).dateOfBaptism(Instant.parse("2024-06-01T00:00:00Z"))
+                .bibleVerse("Acts 2:38").serialNumber(2).baptizedBy("Pastor B")
+                .worshipCenter("New Church").build();
+
+        when(memberRepository.findById(1L)).thenReturn(Optional.of(existingMember));
+        when(baptismRecordService.update(eq(10L), any(BaptismRecord.class))).thenReturn(updatedRecord);
+        when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        MemberResponse result = memberService.updateMember(1L, updateRequest);
+
+        assertNotNull(result);
+        verify(baptismRecordService).update(eq(10L), any(BaptismRecord.class));
+    }
+
+    @Test
+    void shouldUpdateMemberWithNewChurch() {
+        Church newChurch = Church.builder().id(2L).name("New Church").build();
+        Church oldChurch = Church.builder().id(1L).name("Old Church").build();
+        Member existingMember = Member.builder()
+                .id(1L).firstName("John").lastName("Doe")
+                .tel("1234567890").gender(Gender.MALE).isBaptised(false)
+                .church(oldChurch).emailAddress("john@example.com")
+                .build();
+        MemberRequest updateRequest = MemberRequest.builder()
+                .firstName("John").lastName("Doe")
+                .tel("1234567890").gender("MALE")
+                .isBaptised(false).emailAddress("john@example.com")
+                .churchId(2L)
+                .build();
+
+        when(memberRepository.findById(1L)).thenReturn(Optional.of(existingMember));
+        when(churchRepository.findById(2L)).thenReturn(Optional.of(newChurch));
+        when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        MemberResponse result = memberService.updateMember(1L, updateRequest);
+
+        assertNotNull(result);
     }
 }

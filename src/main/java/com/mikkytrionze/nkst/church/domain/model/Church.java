@@ -1,5 +1,6 @@
 package com.mikkytrionze.nkst.church.domain.model;
 
+import com.mikkytrionze.nkst.member.domain.model.Member;
 import com.mikkytrionze.nkst.shared.domain.Auditable;
 import com.mikkytrionze.nkst.pastor.domain.model.Pastor;
 import jakarta.persistence.*;
@@ -43,6 +44,10 @@ public class Church extends Auditable {
     @Builder.Default
     @OneToMany(mappedBy = "church", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pastor> pastors = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "church", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Member> members = new ArrayList<>();
 
     public void addPastor(Pastor pastor) {
         pastors.add(pastor);

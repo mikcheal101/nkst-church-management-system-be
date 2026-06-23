@@ -1,5 +1,6 @@
 package com.mikkytrionze.nkst.member.domain.model;
 
+import com.mikkytrionze.nkst.church.domain.model.Church;
 import com.mikkytrionze.nkst.member.domain.enums.Gender;
 import com.mikkytrionze.nkst.shared.domain.Auditable;
 import jakarta.persistence.*;
@@ -38,6 +39,10 @@ public class Member extends Auditable {
 
     @Builder.Default
     private boolean isBaptised = false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "church_id", nullable = false)
+    private Church church;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "baptism_record_id", referencedColumnName = "id")

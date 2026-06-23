@@ -1,7 +1,7 @@
 package com.mikkytrionze.nkst.pastor.application.service;
 
-import com.mikkytrionze.nkst.member.domain.enums.Gender;
-import com.mikkytrionze.nkst.member.domain.model.BaptismRecord;
+import com.mikkytrionze.nkst.member.api.request.MemberRequest;
+import com.mikkytrionze.nkst.member.application.mapper.MemberMapper;
 import com.mikkytrionze.nkst.member.domain.model.Member;
 import com.mikkytrionze.nkst.member.domain.service.MemberService;
 import com.mikkytrionze.nkst.pastor.api.response.PastorResponse;
@@ -70,25 +70,25 @@ public class PastorServiceImpl implements PastorService {
             pastorRole = pastorRoleService.findPastorRole(pastorRequest.getPastorRoleId());
         }
 
-        Member member = memberService.saveMember(Member.builder()
+        MemberRequest memberRequest = MemberRequest.builder()
                 .firstName(pastorRequest.getFirstName())
                 .lastName(pastorRequest.getLastName())
                 .middleName(pastorRequest.getMiddleName())
                 .emailAddress(pastorRequest.getEmailAddress())
-                .gender(Gender.valueOf(pastorRequest.getGender()))
+                .gender(pastorRequest.getGender())
                 .tel(pastorRequest.getTel())
-                .baptismRecord(BaptismRecord.builder()
-                        .dateOfBaptism(pastorRequest.getDateOfBaptism())
-                        .baptizedBy(pastorRequest.getBaptisedBy())
-                        .address(pastorRequest.getAddress())
-                        .bibleVerse(pastorRequest.getBibleVerse())
-                        .remark(pastorRequest.getRemark())
-                        .imageUri(pastorRequest.getImageUri())
-                        .serialNumber(pastorRequest.getSerialNumber())
-                        .worshipCenter(pastorRequest.getWorshipCenter())
-                        .build())
+                .dateOfBaptism(pastorRequest.getDateOfBaptism())
+                .baptisedBy(pastorRequest.getBaptisedBy())
+                .address(pastorRequest.getAddress())
+                .bibleVerse(pastorRequest.getBibleVerse())
+                .remark(pastorRequest.getRemark())
+                .imageUri(pastorRequest.getImageUri())
+                .serialNumber(pastorRequest.getSerialNumber())
+                .worshipCenter(pastorRequest.getWorshipCenter())
                 .isBaptised(true)
-                .build());
+                .build();
+
+        Member member = MemberMapper.toEntity(memberService.saveMember(memberRequest));
 
         Pastor pastor = Pastor.builder()
                 .member(member)
@@ -109,24 +109,24 @@ public class PastorServiceImpl implements PastorService {
         // fetch the pastor
         Pastor pastor = findPastorById(id);
 
-        Member member = memberService.updateMember(pastor.getMember().getId(), Member.builder()
+        MemberRequest memberRequest = MemberRequest.builder()
                 .firstName(pastorRequest.getFirstName())
                 .lastName(pastorRequest.getLastName())
                 .middleName(pastorRequest.getMiddleName())
                 .emailAddress(pastorRequest.getEmailAddress())
-                .gender(Gender.valueOf(pastorRequest.getGender()))
+                .gender(pastorRequest.getGender())
                 .tel(pastorRequest.getTel())
-                .baptismRecord(BaptismRecord.builder()
-                        .dateOfBaptism(pastorRequest.getDateOfBaptism())
-                        .baptizedBy(pastorRequest.getBaptisedBy())
-                        .address(pastorRequest.getAddress())
-                        .bibleVerse(pastorRequest.getBibleVerse())
-                        .remark(pastorRequest.getRemark())
-                        .imageUri(pastorRequest.getImageUri())
-                        .serialNumber(pastorRequest.getSerialNumber())
-                        .worshipCenter(pastorRequest.getWorshipCenter())
-                        .build())
-                .build());
+                .dateOfBaptism(pastorRequest.getDateOfBaptism())
+                .baptisedBy(pastorRequest.getBaptisedBy())
+                .address(pastorRequest.getAddress())
+                .bibleVerse(pastorRequest.getBibleVerse())
+                .remark(pastorRequest.getRemark())
+                .imageUri(pastorRequest.getImageUri())
+                .serialNumber(pastorRequest.getSerialNumber())
+                .worshipCenter(pastorRequest.getWorshipCenter())
+                .build();
+
+        Member member = MemberMapper.toEntity(memberService.updateMember(pastor.getMember().getId(), memberRequest));
 
         pastor.setMember(member);
 

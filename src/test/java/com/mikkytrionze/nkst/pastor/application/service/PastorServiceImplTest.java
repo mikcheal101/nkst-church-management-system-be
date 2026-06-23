@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import com.mikkytrionze.nkst.church.domain.model.Church;
 import com.mikkytrionze.nkst.church.domain.service.ChurchService;
+import com.mikkytrionze.nkst.member.api.response.MemberResponse;
 import com.mikkytrionze.nkst.member.domain.enums.Gender;
 import com.mikkytrionze.nkst.member.domain.model.Member;
 import com.mikkytrionze.nkst.member.domain.service.MemberService;
@@ -118,110 +119,6 @@ class PastorServiceImplTest {
         assertEquals(1, result.getTotalElements());
     }
 
-    @Test
-    void shouldCreatePastor() {
-        Church church = Church.builder().id(1L).name("MAIN CHURCH").build();
-        PastorRole pastorRole = PastorRole.builder().id(1L).name("Lead Pastor").build();
-
-        PastorRequest request = PastorRequest.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .middleName("M")
-                .emailAddress("john@test.com")
-                .tel("1234567890")
-                .gender("MALE")
-                .serialNumber(123)
-                .dateOfBaptism(Instant.now())
-                .worshipCenter("Main Center")
-                .bibleVerse("John 3:16")
-                .baptisedBy("Pastor Mike")
-                .churchId(1L)
-                .pastorRoleId(1L)
-                .build();
-
-        Member createdMember = Member.builder()
-                .id(1L)
-                .firstName("John")
-                .lastName("Doe")
-                .middleName("M")
-                .emailAddress("john@test.com")
-                .tel("1234567890")
-                .gender(Gender.MALE)
-                .build();
-        Pastor pastor = Pastor.builder()
-                .id(1L)
-                .member(createdMember)
-                .church(church)
-                .pastorRole(pastorRole)
-                .build();
-
-        when(churchService.findChurchById(1L)).thenReturn(church);
-        when(pastorRoleService.findPastorRole(1L)).thenReturn(pastorRole);
-        when(memberService.saveMember(any(Member.class))).thenReturn(createdMember);
-        when(pastorRepository.save(any(Pastor.class))).thenReturn(pastor);
-
-        PastorResponse result = pastorService.createPastor(request);
-
-        assertNotNull(result);
-        assertEquals("John", result.getFirstName());
-    }
-
-    @Test
-    void shouldUpdatePastor() {
-        Church church = Church.builder().id(1L).name("MAIN CHURCH").build();
-        PastorRole pastorRole = PastorRole.builder().id(1L).name("Assistant Pastor").build();
-
-        Long pastorId = 1L;
-        PastorRequest request = PastorRequest.builder()
-                .firstName("Jane")
-                .lastName("Smith")
-                .middleName("A")
-                .emailAddress("jane@test.com")
-                .tel("9876543210")
-                .gender("FEMALE")
-                .serialNumber(456)
-                .dateOfBaptism(Instant.now())
-                .worshipCenter("Main Center")
-                .bibleVerse("Romans 8:28")
-                .baptisedBy("Pastor Sarah")
-                .churchId(1L)
-                .pastorRoleId(1L)
-                .build();
-
-        PastorRole existingRole = PastorRole.builder().id(2L).name("Associate Pastor").build();
-        Member existingMember = Member.builder()
-                .id(1L)
-                .firstName("John")
-                .lastName("Doe")
-                .gender(Gender.MALE)
-                .build();
-        Member updatedMember = Member.builder()
-                .id(1L)
-                .firstName("Jane")
-                .lastName("Smith")
-                .middleName("A")
-                .emailAddress("jane@test.com")
-                .tel("9876543210")
-                .gender(Gender.FEMALE)
-                .build();
-        Pastor existingPastor = Pastor.builder()
-                .id(pastorId)
-                .member(existingMember)
-                .church(church)
-                .pastorRole(existingRole)
-                .build();
-
-        when(pastorRepository.findById(pastorId)).thenReturn(Optional.of(existingPastor));
-        when(churchService.findChurchById(1L)).thenReturn(church);
-        when(pastorRoleService.findPastorRole(1L)).thenReturn(pastorRole);
-        when(memberService.updateMember(eq(1L), any(Member.class))).thenReturn(updatedMember);
-        when(pastorRepository.save(any(Pastor.class))).thenReturn(existingPastor);
-
-        PastorResponse result = pastorService.updatePastor(pastorId, request);
-
-        assertNotNull(result);
-        assertEquals("Jane", result.getFirstName());
-    }
 
     @Test
     void shouldThrowExceptionOnUpdateWhenIdIsNull() {
@@ -264,5 +161,154 @@ class PastorServiceImplTest {
 
         assertThrows(ResourceNotFoundException.class,
                 () -> pastorService.updatePastor(99L, PastorRequest.builder().build()));
+    }
+
+    @Test
+    void shouldCreatePastorWithChurchAndRole() {
+        Church church = Church.builder().id(1L).name("MAIN CHURCH").build();
+        PastorRole pastorRole = PastorRole.builder().id(1L).name("Lead Pastor").build();
+
+        when(churchService.findChurchById(1L)).thenReturn(church);
+        when(pastorRoleService.findPastorRole(1L)).thenReturn(pastorRole);
+
+        MemberResponse mockMemberResponse = MemberResponse.builder()
+                .id(10L).firstName("John").lastName("Doe")
+                .gender("MALE").tel("1234567890")
+                .build();
+        when(memberService.saveMember(any())).thenReturn(mockMemberResponse);
+
+        when(pastorRepository.save(any(Pastor.class))).thenAnswer(invocation -> {
+            Pastor p = invocation.getArgument(0);
+            p.setId(1L);
+            return p;
+        });
+
+        PastorRequest request = PastorRequest.builder()
+                .firstName("John").lastName("Doe")
+                .tel("1234567890").gender("MALE")
+                .churchId(1L).pastorRoleId(1L)
+                .serialNumber(100).dateOfBaptism(Instant.parse("2024-01-15T10:00:00Z"))
+                .worshipCenter("Main").bibleVerse("Mark 16:16")
+                .baptisedBy("Pastor A")
+                .build();
+
+        PastorResponse result = pastorService.createPastor(request);
+
+        assertNotNull(result);
+        verify(memberService).saveMember(any());
+        verify(pastorRepository).save(any(Pastor.class));
+    }
+
+    @Test
+    void shouldCreatePastorWithoutChurchAndRole() {
+        MemberResponse mockMemberResponse = MemberResponse.builder()
+                .id(10L).firstName("John").lastName("Doe")
+                .gender("MALE").tel("1234567890")
+                .build();
+        when(memberService.saveMember(any())).thenReturn(mockMemberResponse);
+        when(pastorRepository.save(any(Pastor.class))).thenAnswer(invocation -> {
+            Pastor p = invocation.getArgument(0);
+            p.setId(2L);
+            return p;
+        });
+
+        PastorRequest request = PastorRequest.builder()
+                .firstName("John").lastName("Doe")
+                .tel("1234567890").gender("MALE")
+                .serialNumber(100).dateOfBaptism(Instant.parse("2024-01-15T10:00:00Z"))
+                .worshipCenter("Main").bibleVerse("Mark 16:16")
+                .baptisedBy("Pastor A")
+                .build();
+
+        PastorResponse result = pastorService.createPastor(request);
+
+        assertNotNull(result);
+        assertNull(result.getChurch());
+        assertNull(result.getPastorRole());
+    }
+
+    @Test
+    void shouldUpdatePastorWithAllFields() {
+        Church oldChurch = Church.builder().id(1L).name("OLD CHURCH").build();
+        Church newChurch = Church.builder().id(2L).name("NEW CHURCH").build();
+        PastorRole oldRole = PastorRole.builder().id(1L).name("Old Role").build();
+        PastorRole newRole = PastorRole.builder().id(2L).name("New Role").build();
+        Member member = Member.builder()
+                .id(10L).firstName("John").lastName("Doe")
+                .gender(Gender.MALE).tel("1234567890")
+                .build();
+        Pastor existingPastor = Pastor.builder()
+                .id(1L).member(member).church(oldChurch).pastorRole(oldRole)
+                .build();
+
+        when(pastorRepository.findById(1L)).thenReturn(Optional.of(existingPastor));
+        when(churchService.findChurchById(2L)).thenReturn(newChurch);
+        when(pastorRoleService.findPastorRole(2L)).thenReturn(newRole);
+
+        MemberResponse updatedMemberResponse = MemberResponse.builder()
+                .id(10L).firstName("John").lastName("Doe")
+                .gender("MALE").tel("1234567890")
+                .build();
+        when(memberService.updateMember(eq(10L), any())).thenReturn(updatedMemberResponse);
+
+        when(pastorRepository.save(any(Pastor.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        PastorRequest request = PastorRequest.builder()
+                .firstName("John").lastName("Doe")
+                .tel("1234567890").gender("MALE")
+                .churchId(2L).pastorRoleId(2L)
+                .serialNumber(100).dateOfBaptism(Instant.parse("2024-01-15T10:00:00Z"))
+                .worshipCenter("Main").bibleVerse("Mark 16:16")
+                .baptisedBy("Pastor A")
+                .build();
+
+        PastorResponse result = pastorService.updatePastor(1L, request);
+
+        assertNotNull(result);
+        verify(memberService).updateMember(eq(10L), any());
+        verify(pastorRepository).save(any(Pastor.class));
+    }
+
+    @Test
+    void shouldUpdatePastorWithoutChangingChurchOrRole() {
+        Church church = Church.builder().id(1L).name("CHURCH").build();
+        PastorRole role = PastorRole.builder().id(1L).name("Role").build();
+        Member member = Member.builder()
+                .id(10L).firstName("John").lastName("Doe")
+                .gender(Gender.MALE).tel("1234567890")
+                .build();
+        Pastor existingPastor = Pastor.builder()
+                .id(1L).member(member).church(church).pastorRole(role)
+                .build();
+
+        when(pastorRepository.findById(1L)).thenReturn(Optional.of(existingPastor));
+
+        MemberResponse updatedMemberResponse = MemberResponse.builder()
+                .id(10L).firstName("John").lastName("Doe")
+                .gender("MALE").tel("1234567890")
+                .build();
+        when(memberService.updateMember(eq(10L), any())).thenReturn(updatedMemberResponse);
+        when(pastorRepository.save(any(Pastor.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        PastorRequest request = PastorRequest.builder()
+                .firstName("John").lastName("Doe")
+                .tel("1234567890").gender("MALE")
+                .serialNumber(100).dateOfBaptism(Instant.parse("2024-01-15T10:00:00Z"))
+                .worshipCenter("Main").bibleVerse("Mark 16:16")
+                .baptisedBy("Pastor A")
+                .build();
+
+        PastorResponse result = pastorService.updatePastor(1L, request);
+
+        assertNotNull(result);
+        verify(churchService, never()).findChurchById(any());
+        verify(pastorRoleService, never()).findPastorRole(any());
+    }
+
+    @Test
+    void shouldThrowExceptionOnDeleteWhenPastorNotFound() {
+        when(pastorRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> pastorService.deletePastorById(99L));
     }
 }

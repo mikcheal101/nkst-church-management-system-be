@@ -1,6 +1,9 @@
 package com.mikkytrionze.nkst.member.domain.service;
 
-import com.mikkytrionze.nkst.member.domain.model.Member;
+import com.mikkytrionze.nkst.member.api.request.MemberRequest;
+import com.mikkytrionze.nkst.member.api.response.MemberResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Service interface for Member domain operations.
@@ -19,24 +22,49 @@ public interface MemberService {
      * Retrieves the details of a specific member.
      *
      * @param id The unique identifier of the member.
-     * @return The {@link Member} matching the requested ID.
+     * @return The {@link MemberResponse} matching the requested ID.
      */
-    Member getById(Long id);
+    MemberResponse getById(Long id);
 
     /**
      * Persists a new member record in the system.
      *
-     * @param member The Member entity to be saved.
-     * @return The saved {@link Member} including the generated ID.
+     * @param memberRequest The MemberRequest entity to be saved.
+     * @return The saved {@link MemberResponse} including the generated ID.
      */
-    Member saveMember(Member member);
+    MemberResponse saveMember(MemberRequest memberRequest);
 
     /**
      * Updates information for an existing member.
      *
      * @param id The unique identifier of the member to update.
      * @param member The Member entity containing the updated details.
-     * @return The updated {@link Member}.
+     * @return The updated {@link MemberResponse}.
      */
-    Member updateMember(Long id, Member member);
+    MemberResponse updateMember(Long id, MemberRequest member);
+
+    /**
+     * Retrieves a paginated view of all the members.
+     *
+     * @param pageable Pagination and sorting info.
+     * @return A {@link Page} of {@link MemberResponse} objects.
+     */
+    Page<MemberResponse> getAllMembers(Pageable pageable);
+
+    /**
+     * Retrieves a paginated view of members from a church.
+     *
+     * @param churchId The unique identifier of the church to fetch from.
+     * @param pageable Pagination and sorting info.
+     * @return A {@link Page} of {@link MemberResponse} objects.
+     */
+    Page<MemberResponse> getAllChurchMembers(Long churchId, Pageable pageable);
+
+    /**
+     * Retrieves a details of a specific church
+     * @param churchId The church unique identifier.
+     * @param memberId The member unique identifier.
+     * @return The {@link MemberResponse} matching the requested ids.
+     */
+    MemberResponse getChurchMember(Long churchId, Long memberId);
 }
