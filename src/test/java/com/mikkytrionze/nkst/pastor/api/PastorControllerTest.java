@@ -67,15 +67,9 @@ class PastorControllerTest {
     @Test
     void shouldCreatePastor() throws Exception {
         PastorRequest request = PastorRequest.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .tel("1234567890")
-                .gender("MALE")
-                .serialNumber(123)
-                .dateOfBaptism(Instant.now())
-                .worshipCenter("Main Center")
-                .bibleVerse("John 3:16")
-                .baptisedBy("Pastor Mike")
+                .churchId(1L)
+                .pastorRoleId(1L)
+                .memberId(1L)
                 .build();
 
         PastorResponse response = PastorResponse.builder()
@@ -114,15 +108,9 @@ class PastorControllerTest {
     @Test
     void shouldUpdatePastor() throws Exception {
         PastorRequest request = PastorRequest.builder()
-                .firstName("Jane")
-                .lastName("Smith")
-                .tel("9876543210")
-                .gender("FEMALE")
-                .serialNumber(456)
-                .dateOfBaptism(Instant.now())
-                .worshipCenter("Main Center")
-                .bibleVerse("Romans 8:28")
-                .baptisedBy("Pastor Sarah")
+                .churchId(1L)
+                .pastorRoleId(1L)
+                .memberId(2L)
                 .build();
 
         PastorResponse response = PastorResponse.builder()

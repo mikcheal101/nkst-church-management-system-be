@@ -15,7 +15,7 @@ import com.mikkytrionze.nkst.member.domain.model.Member;
 import com.mikkytrionze.nkst.member.domain.repository.MemberRepository;
 import com.mikkytrionze.nkst.member.domain.service.BaptismRecordService;
 import com.mikkytrionze.nkst.shared.exception.ResourceNotFoundException;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -163,7 +163,7 @@ class MemberServiceImplTest {
         Church church = Church.builder().id(1L).name("Test Church").address("123 Main St").build();
         BaptismRecord baptismRecord = BaptismRecord.builder()
                 .id(10L)
-                .dateOfBaptism(Instant.parse("2024-01-15T10:00:00Z"))
+                .dateOfBaptism(LocalDate.parse("2024-01-15"))
                 .bibleVerse("Mark 16:16")
                 .serialNumber(100)
                 .baptizedBy("Pastor John")
@@ -178,7 +178,7 @@ class MemberServiceImplTest {
                 .isBaptised(true)
                 .emailAddress("jane@example.com")
                 .churchId(1L)
-                .dateOfBaptism(Instant.parse("2024-01-15T10:00:00Z"))
+                .dateOfBaptism(LocalDate.parse("2024-01-15"))
                 .bibleVerse("Mark 16:16")
                 .serialNumber(100)
                 .baptisedBy("Pastor John")
@@ -326,7 +326,7 @@ class MemberServiceImplTest {
     void shouldUpdateMemberWithBaptismRecord() {
         Church church = Church.builder().id(1L).name("Test Church").build();
         BaptismRecord existingRecord = BaptismRecord.builder()
-                .id(10L).dateOfBaptism(Instant.parse("2023-01-01T00:00:00Z"))
+                .id(10L).dateOfBaptism(LocalDate.parse("2023-01-01"))
                 .bibleVerse("Mark 16:16").serialNumber(1).baptizedBy("Pastor A")
                 .worshipCenter("Main Church").build();
         Member existingMember = Member.builder()
@@ -338,12 +338,12 @@ class MemberServiceImplTest {
                 .firstName("New").lastName("Name")
                 .tel("1234567890").gender("MALE")
                 .isBaptised(true).emailAddress("new@example.com")
-                .dateOfBaptism(Instant.parse("2024-06-01T00:00:00Z"))
+                .dateOfBaptism(LocalDate.parse("2024-06-01"))
                 .bibleVerse("Acts 2:38").serialNumber(2)
                 .baptisedBy("Pastor B").worshipCenter("New Church")
                 .build();
         BaptismRecord updatedRecord = BaptismRecord.builder()
-                .id(10L).dateOfBaptism(Instant.parse("2024-06-01T00:00:00Z"))
+                .id(10L).dateOfBaptism(LocalDate.parse("2024-06-01"))
                 .bibleVerse("Acts 2:38").serialNumber(2).baptizedBy("Pastor B")
                 .worshipCenter("New Church").build();
 

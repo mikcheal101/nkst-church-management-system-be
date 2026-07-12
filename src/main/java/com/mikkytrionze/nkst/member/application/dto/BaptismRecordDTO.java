@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -14,7 +14,7 @@ import java.time.Instant;
 public class BaptismRecordDTO {
     private Long id;
     private Integer serialNumber;
-    private Instant dateOfBaptism;
+    private LocalDate dateOfBaptism;
     private String worshipCenter;
     private String bibleVerse;
     private String baptizedBy;

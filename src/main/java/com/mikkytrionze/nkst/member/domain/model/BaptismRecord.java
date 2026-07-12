@@ -8,7 +8,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -24,7 +24,7 @@ public class BaptismRecord extends Auditable {
     private int serialNumber;
 
     @Column(nullable = false)
-    private Instant dateOfBaptism;
+    private LocalDate dateOfBaptism;
 
     @Column(nullable = false)
     private String worshipCenter; // the church name where the member was baptised at

@@ -82,4 +82,19 @@
                                  referencedColumnNames="id" />
     </changeSet>
 
+    <changeSet id="1783115113258" author="hemen.hirekaan">
+        <preConditions>
+            <tableExists tableName="pastors" />
+            <columnExists tableName="pastors" columnName="member_id" />
+            <columnExists tableName="pastors" columnName="church_id" />
+        </preConditions>
+        
+        <addUniqueConstraint tableName="pastors"
+                             columnNames="member_id"
+                             constraintName="uk_pastor_member" />
+        <addUniqueConstraint tableName="pastors"
+                             columnNames="member_id, church_id"
+                             constraintName="uk_pastor_member_church" />
+    </changeSet>
+
 </databaseChangeLog>

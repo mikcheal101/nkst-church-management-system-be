@@ -4,14 +4,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.mikkytrionze.nkst.member.application.dto.BaptismRecordDTO;
 import com.mikkytrionze.nkst.member.domain.model.BaptismRecord;
-import java.time.Instant;
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.Test;
 
 class BaptismRecordMapperTest {
 
     @Test
     void shouldMapBaptismRecordToDTO() {
-        Instant now = Instant.now();
+        LocalDate now = LocalDate.now();
         BaptismRecord baptismRecord = BaptismRecord.builder()
                 .id(1L)
                 .address("123 Main St")
@@ -40,7 +41,7 @@ class BaptismRecordMapperTest {
 
     @Test
     void shouldMapDTOToBaptismRecord() {
-        Instant now = Instant.now();
+        LocalDate now = LocalDate.now();
         BaptismRecordDTO dto = BaptismRecordDTO.builder()
                 .address("123 Main St")
                 .dateOfBaptism(now)

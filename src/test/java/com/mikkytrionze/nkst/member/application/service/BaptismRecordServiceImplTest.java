@@ -7,7 +7,7 @@ import static org.mockito.Mockito.*;
 import com.mikkytrionze.nkst.member.domain.model.BaptismRecord;
 import com.mikkytrionze.nkst.member.domain.repository.BaptismRecordRepository;
 import com.mikkytrionze.nkst.shared.exception.ResourceNotFoundException;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +29,7 @@ class BaptismRecordServiceImplTest {
         BaptismRecord baptismRecord = BaptismRecord.builder()
                 .id(1L)
                 .serialNumber(100)
-                .dateOfBaptism(Instant.now())
+                .dateOfBaptism(LocalDate.now())
                 .worshipCenter("Main Church")
                 .bibleVerse("John 3:16")
                 .baptizedBy("Pastor Mike")
@@ -60,7 +60,7 @@ class BaptismRecordServiceImplTest {
     void shouldSaveBaptismRecord() {
         BaptismRecord baptismRecord = BaptismRecord.builder()
                 .serialNumber(100)
-                .dateOfBaptism(Instant.now())
+                .dateOfBaptism(LocalDate.now())
                 .worshipCenter("Main Church")
                 .bibleVerse("John 3:16")
                 .baptizedBy("Pastor Mike")
@@ -69,7 +69,7 @@ class BaptismRecordServiceImplTest {
         BaptismRecord savedBaptismRecord = BaptismRecord.builder()
                 .id(1L)
                 .serialNumber(100)
-                .dateOfBaptism(Instant.now())
+                .dateOfBaptism(LocalDate.now())
                 .worshipCenter("Main Church")
                 .bibleVerse("John 3:16")
                 .baptizedBy("Pastor Mike")
@@ -89,7 +89,7 @@ class BaptismRecordServiceImplTest {
         BaptismRecord existingBaptismRecord = BaptismRecord.builder()
                 .id(baptismRecordId)
                 .serialNumber(100)
-                .dateOfBaptism(Instant.now())
+                .dateOfBaptism(LocalDate.now())
                 .worshipCenter("Main Church")
                 .bibleVerse("John 3:16")
                 .baptizedBy("Pastor Mike")
@@ -97,7 +97,7 @@ class BaptismRecordServiceImplTest {
 
         BaptismRecord updateBaptismRecord = BaptismRecord.builder()
                 .serialNumber(200)
-                .dateOfBaptism(Instant.now())
+                .dateOfBaptism(LocalDate.now())
                 .worshipCenter("New Church")
                 .bibleVerse("Matthew 28:19")
                 .baptizedBy("Pastor Jane")

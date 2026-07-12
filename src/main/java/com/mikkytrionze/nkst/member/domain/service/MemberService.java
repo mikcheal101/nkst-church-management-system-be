@@ -2,6 +2,7 @@ package com.mikkytrionze.nkst.member.domain.service;
 
 import com.mikkytrionze.nkst.member.api.request.MemberRequest;
 import com.mikkytrionze.nkst.member.api.response.MemberResponse;
+import com.mikkytrionze.nkst.member.domain.model.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -25,6 +26,14 @@ public interface MemberService {
      * @return The {@link MemberResponse} matching the requested ID.
      */
     MemberResponse getById(Long id);
+
+    /**
+     * Retrieves the details of a specific member.
+     *
+     * @param id The unique identifier of the member.
+     * @return The {@link Member} matching the requested ID.
+     */
+    Member findMemberById(Long id);
 
     /**
      * Persists a new member record in the system.

@@ -23,9 +23,9 @@ public class ChurchMapper {
                 .map(subChurch -> ChurchMapper.toDTO(subChurch, true))
                 .toList() : List.of();
 
-        List<PastorDTO> pastors = church.getPastors().stream()
+        List<PastorDTO> pastors = fetchChildren ? church.getPastors().stream()
                 .map(pastor -> PastorMapper.toDTO(pastor))
-                .toList();
+                .toList() : List.of();
 
         return ChurchDTO.builder()
                 .id(church.getId())

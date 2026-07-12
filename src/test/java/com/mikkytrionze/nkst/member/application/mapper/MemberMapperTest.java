@@ -8,17 +8,17 @@ import com.mikkytrionze.nkst.member.application.dto.MemberDTO;
 import com.mikkytrionze.nkst.member.domain.enums.Gender;
 import com.mikkytrionze.nkst.member.domain.model.BaptismRecord;
 import com.mikkytrionze.nkst.member.domain.model.Member;
-import java.time.Instant;
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.Test;
 
 class MemberMapperTest {
 
     @Test
     void shouldMapMemberToDTO() {
-        Instant now = Instant.now();
         BaptismRecord baptismRecord = BaptismRecord.builder()
                 .id(1L)
-                .dateOfBaptism(now)
+                .dateOfBaptism(LocalDate.now())
                 .worshipCenter("Main Center")
                 .build();
 
@@ -50,10 +50,9 @@ class MemberMapperTest {
 
     @Test
     void shouldMapMemberToResponse() {
-        Instant now = Instant.now();
         BaptismRecord baptismRecord = BaptismRecord.builder()
                 .id(1L)
-                .dateOfBaptism(now)
+                .dateOfBaptism(LocalDate.now())
                 .worshipCenter("Main Center")
                 .build();
 
@@ -85,9 +84,8 @@ class MemberMapperTest {
 
     @Test
     void shouldMapDTOToMember() {
-        Instant now = Instant.now();
         BaptismRecordDTO baptismRecordDTO = BaptismRecordDTO.builder()
-                .dateOfBaptism(now)
+                .dateOfBaptism(LocalDate.now())
                 .worshipCenter("Main Center")
                 .serialNumber(123)
                 .build();
@@ -118,9 +116,8 @@ class MemberMapperTest {
 
     @Test
     void shouldMapResponseToMember() {
-        Instant now = Instant.now();
         BaptismRecordDTO baptismRecordDTO = BaptismRecordDTO.builder()
-                .dateOfBaptism(now)
+                .dateOfBaptism(LocalDate.now())
                 .worshipCenter("Main Center")
                 .serialNumber(456)
                 .build();

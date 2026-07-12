@@ -4,7 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.time.Instant;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -44,5 +45,5 @@ public class MemberRequest {
     private String remark;
     private String address;
     private String imageUri;
-    private Instant dateOfBaptism;
+    private LocalDate dateOfBaptism;
 }

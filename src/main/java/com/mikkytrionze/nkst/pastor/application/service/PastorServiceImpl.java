@@ -1,7 +1,5 @@
 package com.mikkytrionze.nkst.pastor.application.service;
 
-import com.mikkytrionze.nkst.member.api.request.MemberRequest;
-import com.mikkytrionze.nkst.member.application.mapper.MemberMapper;
 import com.mikkytrionze.nkst.member.domain.model.Member;
 import com.mikkytrionze.nkst.member.domain.service.MemberService;
 import com.mikkytrionze.nkst.pastor.api.response.PastorResponse;
@@ -15,6 +13,8 @@ import com.mikkytrionze.nkst.church.domain.service.ChurchService;
 import com.mikkytrionze.nkst.pastor.domain.service.PastorRoleService;
 import com.mikkytrionze.nkst.pastor.domain.service.PastorService;
 import com.mikkytrionze.nkst.shared.exception.ResourceNotFoundException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +34,9 @@ public class PastorServiceImpl implements PastorService {
     private final ChurchService churchService;
     private final PastorRoleService pastorRoleService;
     private final MemberService memberService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public Page<PastorResponse> getPastors(Pageable pageable) {
@@ -57,38 +60,19 @@ public class PastorServiceImpl implements PastorService {
     @Override
     @Transactional
     public PastorResponse createPastor(PastorRequest pastorRequest) {
-        log.info("Creating a pastor with name: {} {}", pastorRequest.getFirstName(), pastorRequest.getLastName());
+        log.info("Creating a pastor with member id: {} for church {} with roleId: {}",
+                pastorRequest.getMemberId(),
+                pastorRequest.getChurchId(),
+                pastorRequest.getPastorRoleId());
 
         // get the church
-        Church church = null;
-        if (pastorRequest.getChurchId() != null) {
-            church = churchService.findChurchById(pastorRequest.getChurchId());
-        }
+        Church church = churchService.findChurchById(pastorRequest.getChurchId());
 
-        PastorRole pastorRole = null;
-        if (pastorRequest.getPastorRoleId() != null) {
-            pastorRole = pastorRoleService.findPastorRole(pastorRequest.getPastorRoleId());
-        }
+        // Get the pastor's role
+        PastorRole pastorRole = pastorRoleService.findPastorRole(pastorRequest.getPastorRoleId());
 
-        MemberRequest memberRequest = MemberRequest.builder()
-                .firstName(pastorRequest.getFirstName())
-                .lastName(pastorRequest.getLastName())
-                .middleName(pastorRequest.getMiddleName())
-                .emailAddress(pastorRequest.getEmailAddress())
-                .gender(pastorRequest.getGender())
-                .tel(pastorRequest.getTel())
-                .dateOfBaptism(pastorRequest.getDateOfBaptism())
-                .baptisedBy(pastorRequest.getBaptisedBy())
-                .address(pastorRequest.getAddress())
-                .bibleVerse(pastorRequest.getBibleVerse())
-                .remark(pastorRequest.getRemark())
-                .imageUri(pastorRequest.getImageUri())
-                .serialNumber(pastorRequest.getSerialNumber())
-                .worshipCenter(pastorRequest.getWorshipCenter())
-                .isBaptised(true)
-                .build();
-
-        Member member = MemberMapper.toEntity(memberService.saveMember(memberRequest));
+        // Get member
+        Member member = memberService.findMemberById(pastorRequest.getMemberId());
 
         Pastor pastor = Pastor.builder()
                 .member(member)
@@ -96,8 +80,7 @@ public class PastorServiceImpl implements PastorService {
                 .church(church)
                 .build();
 
-        pastorRepository.save(pastor);
-        return PastorMapper.toResponse(pastor);
+        return PastorMapper.toResponse(pastorRepository.save(pastor));
     }
 
     @Override
@@ -109,39 +92,15 @@ public class PastorServiceImpl implements PastorService {
         // fetch the pastor
         Pastor pastor = findPastorById(id);
 
-        MemberRequest memberRequest = MemberRequest.builder()
-                .firstName(pastorRequest.getFirstName())
-                .lastName(pastorRequest.getLastName())
-                .middleName(pastorRequest.getMiddleName())
-                .emailAddress(pastorRequest.getEmailAddress())
-                .gender(pastorRequest.getGender())
-                .tel(pastorRequest.getTel())
-                .dateOfBaptism(pastorRequest.getDateOfBaptism())
-                .baptisedBy(pastorRequest.getBaptisedBy())
-                .address(pastorRequest.getAddress())
-                .bibleVerse(pastorRequest.getBibleVerse())
-                .remark(pastorRequest.getRemark())
-                .imageUri(pastorRequest.getImageUri())
-                .serialNumber(pastorRequest.getSerialNumber())
-                .worshipCenter(pastorRequest.getWorshipCenter())
-                .build();
+        // update the role
+        PastorRole pastorRole = pastorRoleService.findPastorRole(pastorRequest.getPastorRoleId());
+        pastor.setPastorRole(pastorRole);
 
-        Member member = MemberMapper.toEntity(memberService.updateMember(pastor.getMember().getId(), memberRequest));
-
-        pastor.setMember(member);
-
-        if (pastorRequest.getPastorRoleId() != null) {
-            PastorRole pastorRole = pastorRoleService.findPastorRole(pastorRequest.getPastorRoleId());
-            pastor.setPastorRole(pastorRole);
-        }
-
-        if (pastorRequest.getChurchId() != null) {
-            Church church = churchService.findChurchById(pastorRequest.getChurchId());
-            pastor.setChurch(church);
-        }
+        // update the church
+        Church church = churchService.findChurchById(pastorRequest.getChurchId());
+        pastor.setChurch(church);
 
         pastorRepository.save(pastor);
-
         return PastorMapper.toResponse(pastor);
     }
 

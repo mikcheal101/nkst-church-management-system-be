@@ -17,7 +17,7 @@ public class MemberMapper {
         return MemberDTO.builder()
                 .id(member.getId())
                 .tel(member.getTel())
-                .gender(member.getGender().name())
+                .gender(member.getGender().name().toUpperCase())
                 .isBaptised(member.isBaptised())
                 .lastName(member.getLastName())
                 .middleName(member.getMiddleName())
@@ -38,7 +38,7 @@ public class MemberMapper {
                 .firstName(member.getFirstName())
                 .middleName(member.getMiddleName())
                 .lastName(member.getLastName())
-                .gender(member.getGender().name())
+                .gender(member.getGender().name().toUpperCase())
                 .emailAddress(member.getEmailAddress())
                 .isBaptised(member.isBaptised())
                 .church(ChurchMapper.toDTO(member.getChurch(), false))
@@ -69,7 +69,7 @@ public class MemberMapper {
             return null;
         }
 
-        Gender gender = Objects.isNull(memberResponse.getGender()) ? Gender.MALE : Gender.valueOf(memberResponse.getGender());
+        Gender gender = Objects.isNull(memberResponse.getGender()) ? Gender.MALE : Gender.valueOf(memberResponse.getGender().toUpperCase());
         return Member.builder()
                 .tel(memberResponse.getTel())
                 .gender(gender)

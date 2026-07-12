@@ -3,7 +3,7 @@ package com.mikkytrionze.nkst.member.api.request;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class BaptismRecordValidator implements ConstraintValidator<ValidateBaptismRecord, MemberRequest> {
@@ -39,7 +39,7 @@ public class BaptismRecordValidator implements ConstraintValidator<ValidateBapti
                     "dateOfBaptism",
                     "Date of baptism is required!");
             isValid = false;
-        } else if (memberRequest.getDateOfBaptism().isAfter(Instant.now())) {
+        } else if (memberRequest.getDateOfBaptism().isAfter(LocalDate.now())) {
             addViolation(constraintValidatorContext,
                     "dateOfBaptism",
                     "Date of baptism cannot be a date in the future");

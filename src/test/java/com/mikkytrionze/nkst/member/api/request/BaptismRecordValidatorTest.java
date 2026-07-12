@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -51,7 +51,7 @@ class BaptismRecordValidatorTest {
     void shouldReturnFalseWhenSerialNumberIsNull() {
         MemberRequest request = MemberRequest.builder()
                 .isBaptised(true)
-                .dateOfBaptism(Instant.now().minusSeconds(3600))
+                .dateOfBaptism(LocalDate.now().minusDays(1))
                 .worshipCenter("Main Center")
                 .bibleVerse("John 3:16")
                 .baptisedBy("Pastor Mike")
@@ -65,7 +65,7 @@ class BaptismRecordValidatorTest {
         MemberRequest request = MemberRequest.builder()
                 .isBaptised(true)
                 .serialNumber(0)
-                .dateOfBaptism(Instant.now().minusSeconds(3600))
+                .dateOfBaptism(LocalDate.now().minusDays(1))
                 .worshipCenter("Main Center")
                 .bibleVerse("John 3:16")
                 .baptisedBy("Pastor Mike")
@@ -92,7 +92,7 @@ class BaptismRecordValidatorTest {
         MemberRequest request = MemberRequest.builder()
                 .isBaptised(true)
                 .serialNumber(123)
-                .dateOfBaptism(Instant.now().plusSeconds(3600))
+                .dateOfBaptism(LocalDate.now().plusDays(1))
                 .worshipCenter("Main Center")
                 .bibleVerse("John 3:16")
                 .baptisedBy("Pastor Mike")
@@ -106,7 +106,7 @@ class BaptismRecordValidatorTest {
         MemberRequest request = MemberRequest.builder()
                 .isBaptised(true)
                 .serialNumber(123)
-                .dateOfBaptism(Instant.now().minusSeconds(3600))
+                .dateOfBaptism(LocalDate.now().minusDays(1))
                 .worshipCenter("   ")
                 .bibleVerse("John 3:16")
                 .baptisedBy("Pastor Mike")
@@ -120,7 +120,7 @@ class BaptismRecordValidatorTest {
         MemberRequest request = MemberRequest.builder()
                 .isBaptised(true)
                 .serialNumber(123)
-                .dateOfBaptism(Instant.now().minusSeconds(3600))
+                .dateOfBaptism(LocalDate.now().minusDays(1))
                 .worshipCenter("Main Center")
                 .bibleVerse("   ")
                 .baptisedBy("Pastor Mike")
@@ -134,7 +134,7 @@ class BaptismRecordValidatorTest {
         MemberRequest request = MemberRequest.builder()
                 .isBaptised(true)
                 .serialNumber(123)
-                .dateOfBaptism(Instant.now().minusSeconds(3600))
+                .dateOfBaptism(LocalDate.now().minusDays(1))
                 .worshipCenter("Main Center")
                 .bibleVerse("John 3:16")
                 .baptisedBy("   ")
@@ -148,7 +148,7 @@ class BaptismRecordValidatorTest {
         MemberRequest request = MemberRequest.builder()
                 .isBaptised(true)
                 .serialNumber(123)
-                .dateOfBaptism(Instant.now().minusSeconds(3600))
+                .dateOfBaptism(LocalDate.now().minusDays(1))
                 .worshipCenter("Main Center")
                 .bibleVerse("John 3:16")
                 .baptisedBy("Pastor Mike")
@@ -162,7 +162,7 @@ class BaptismRecordValidatorTest {
         MemberRequest request = MemberRequest.builder()
                 .isBaptised(true)
                 .serialNumber(123)
-                .dateOfBaptism(Instant.now().minusSeconds(3600))
+                .dateOfBaptism(LocalDate.now().minusDays(1))
                 .worshipCenter("Main Center")
                 .bibleVerse("John 3:16")
                 .baptisedBy("Pastor Mike")

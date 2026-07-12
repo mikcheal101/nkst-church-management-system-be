@@ -18,8 +18,8 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("deleted = false")
 public class Pastor extends Auditable {
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "member_id", referencedColumnName = "id")
+    @OneToOne
+    @JoinColumn(name = "member_id", referencedColumnName = "id", unique = true)
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -39,6 +39,13 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public Member findMemberById(Long id) {
+        log.info("Finding Member by Id: {}", id);
+
+        return findById(id, null);
+    }
+
+    @Override
     public void deleteMember(Long id) {
         log.info("Deleting Member with id: {}", id);
 
@@ -61,7 +68,7 @@ public class MemberServiceImpl implements MemberService {
                 .middleName(memberRequest.getMiddleName())
                 .lastName(memberRequest.getLastName())
                 .emailAddress(memberRequest.getEmailAddress())
-                .gender(Gender.valueOf(memberRequest.getGender()))
+                .gender(Gender.valueOf(memberRequest.getGender().toUpperCase()))
                 .isBaptised(memberRequest.getIsBaptised())
                 .church(church)
                 .build();
