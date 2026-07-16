@@ -24,7 +24,7 @@ public interface ChurchService {
      * @param pageable Pagination and sorting information (page number, size, sort).
      * @return A {@link Page} of {@link ChurchResponse} objects.
      */
-    Page<ChurchResponse> getSubChurches(Long id, Pageable pageable);
+    Page<ChurchResponse> getSubChurches(final Long id, Pageable pageable);
 
     /**
      * Persists a new church record in the system.
@@ -39,14 +39,14 @@ public interface ChurchService {
      * @param churchRequest The DTO containing the updated church information.
      * @return The updated {@link ChurchResponse}.
      */
-    ChurchResponse updateChurch(Long id, ChurchRequest churchRequest);
+    ChurchResponse updateChurch(final Long id, ChurchRequest churchRequest);
 
     /**
      * Fetches details for a specific church.
      * @param id The unique identifier of the target church.
      * @return The {@link ChurchResponse} matching the requested ID.
      */
-    ChurchResponse getChurch(Long id);
+    ChurchResponse getChurch(final Long id);
 
     /**
      * Internal utility to retrieve a domain entity.
@@ -54,7 +54,7 @@ public interface ChurchService {
      * @return The raw {@link Church} domain entity.
      * @throws ResourceNotFoundException if the entity does not exist.
      */
-    Church findChurchById(Long id);
+    Church findChurchById(final Long id);
 
     /**
      * Removes a church record from the system (Soft delete).

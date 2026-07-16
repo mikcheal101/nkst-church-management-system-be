@@ -47,4 +47,9 @@ public class Member extends Auditable {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "baptism_record_id", referencedColumnName = "id")
     private BaptismRecord baptismRecord;
+
+    @Column(unique = true)
+    private Long userId;
+
+    private String userType;
 }

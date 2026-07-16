@@ -1,11 +1,13 @@
 package com.mikkytrionze.nkst.member.application.service;
 
+import com.mikkytrionze.member.application.dto.MemberCreatedEvent;
 import com.mikkytrionze.nkst.church.domain.model.Church;
 import com.mikkytrionze.nkst.church.domain.repository.ChurchRepository;
 import com.mikkytrionze.nkst.member.api.request.MemberRequest;
 import com.mikkytrionze.nkst.member.api.response.MemberResponse;
 import com.mikkytrionze.nkst.member.application.mapper.MemberMapper;
 import com.mikkytrionze.nkst.member.domain.enums.Gender;
+import com.mikkytrionze.nkst.member.domain.gateway.MemberEventPublisher;
 import com.mikkytrionze.nkst.member.domain.model.BaptismRecord;
 import com.mikkytrionze.nkst.member.domain.model.Member;
 import com.mikkytrionze.nkst.member.domain.repository.MemberRepository;
@@ -20,6 +22,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -28,6 +32,7 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final BaptismRecordService baptismRecordService;
     private final ChurchRepository churchRepository;
+    private final MemberEventPublisher memberEventPublisher;
 
     @Override
     public MemberResponse getById(Long id) {
@@ -89,6 +94,16 @@ public class MemberServiceImpl implements MemberService {
 
         Member savedMember = memberRepository.save(member);
 
+        // publish member to kafka
+        MemberCreatedEvent memberCreatedEvent = MemberCreatedEvent.builder()
+                .memberId(savedMember.getId())
+                .username(savedMember.getTel().trim().isBlank() ?
+                        savedMember.getEmailAddress().trim().toLowerCase() : savedMember.getTel().trim())
+                .password(null)
+                .roles(List.of(Boolean.TRUE.equals(memberRequest.getIsBaptised()) ? "MEMBER_BAPTISED" : "MEMBER_UNBAPTISED"))
+                .build();
+        memberEventPublisher.publishMemberCreated(memberCreatedEvent);
+
         log.info("Saved Member with id: {}", member.getId());
 
         return MemberMapper.toResponse(savedMember);
@@ -148,6 +163,15 @@ public class MemberServiceImpl implements MemberService {
         Member member = findById(memberId, churchId);
 
         return MemberMapper.toResponse(member);
+    }
+
+    @Override
+    public Page<MemberResponse> fetchProspectiveAdmins(Long churchId, Pageable pageable) {
+        log.info("Fetching prospective admins for church id: {}", churchId);
+
+        Page<Member> churchAdmins = this.memberRepository.findAllByChurchIdAndUserTypeChurchAdmin(churchId, pageable);
+
+        return churchAdmins.map(MemberMapper::toResponse);
     }
 
     private static @NonNull BaptismRecord getBaptismRecord(MemberRequest memberRequest, BaptismRecord baptismRecord) {

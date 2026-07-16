@@ -17,7 +17,7 @@ public interface MemberService {
      *
      * @param id The unique identifier of the member to be removed.
      */
-    void deleteMember(Long id);
+    void deleteMember(final Long id);
 
     /**
      * Retrieves the details of a specific member.
@@ -25,7 +25,7 @@ public interface MemberService {
      * @param id The unique identifier of the member.
      * @return The {@link MemberResponse} matching the requested ID.
      */
-    MemberResponse getById(Long id);
+    MemberResponse getById(final Long id);
 
     /**
      * Retrieves the details of a specific member.
@@ -33,7 +33,7 @@ public interface MemberService {
      * @param id The unique identifier of the member.
      * @return The {@link Member} matching the requested ID.
      */
-    Member findMemberById(Long id);
+    Member findMemberById(final Long id);
 
     /**
      * Persists a new member record in the system.
@@ -50,7 +50,7 @@ public interface MemberService {
      * @param member The Member entity containing the updated details.
      * @return The updated {@link MemberResponse}.
      */
-    MemberResponse updateMember(Long id, MemberRequest member);
+    MemberResponse updateMember(final Long id, MemberRequest member);
 
     /**
      * Retrieves a paginated view of all the members.
@@ -67,7 +67,7 @@ public interface MemberService {
      * @param pageable Pagination and sorting info.
      * @return A {@link Page} of {@link MemberResponse} objects.
      */
-    Page<MemberResponse> getAllChurchMembers(Long churchId, Pageable pageable);
+    Page<MemberResponse> getAllChurchMembers(final Long churchId, Pageable pageable);
 
     /**
      * Retrieves a details of a specific church
@@ -75,5 +75,13 @@ public interface MemberService {
      * @param memberId The member unique identifier.
      * @return The {@link MemberResponse} matching the requested ids.
      */
-    MemberResponse getChurchMember(Long churchId, Long memberId);
+    MemberResponse getChurchMember(final Long churchId, final Long memberId);
+
+    /**
+     * Fetches all the members that are prospective church admins.
+     * @param churchId - The church which requires the admin.
+     * @param pageable Pagination.
+     * @return The {@link Page} of {@link MemberResponse}.
+     */
+    Page<MemberResponse> fetchProspectiveAdmins(final Long churchId, Pageable pageable);
 }

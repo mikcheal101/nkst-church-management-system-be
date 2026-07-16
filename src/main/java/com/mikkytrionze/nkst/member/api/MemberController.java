@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -23,6 +24,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('can_read_members')")
     public ResponseEntity<MemberResponse> getMember(@PathVariable("id") Long id) {
         log.info("Getting member by id: {}", id);
 
@@ -32,6 +34,7 @@ public class MemberController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('can_view_members')")
     public ResponseEntity<Page<MemberResponse>> getMembers(
             @PageableDefault(size = Constants.PAGE_SIZE) Pageable pageable) {
         log.info("Getting all the members by page: {}", pageable);
@@ -42,6 +45,7 @@ public class MemberController {
     }
 
     @GetMapping("/church-members/{churchId}")
+    @PreAuthorize("hasAuthority('can_view_members')")
     public ResponseEntity<Page<MemberResponse>> getChurchMembers(
             @PathVariable("churchId") Long churchId,
             @PageableDefault(size = Constants.PAGE_SIZE) Pageable pageable) {
@@ -53,6 +57,7 @@ public class MemberController {
     }
 
     @GetMapping("/church-members/{churchId}/{memberId}")
+    @PreAuthorize("hasAuthority('can_read_members')")
     public ResponseEntity<MemberResponse> getChurchMember(@PathVariable("churchId") Long churchId, @PathVariable("memberId") Long memberId) {
         log.info("Getting church member: {} from church: {}", memberId, churchId);
 
@@ -62,6 +67,7 @@ public class MemberController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('can_create_members')")
     public ResponseEntity<MemberResponse> createMember(@Valid @RequestBody MemberRequest request) {
         log.info("Creating member: {}", request);
         MemberResponse response = memberService.saveMember(request);
@@ -69,6 +75,7 @@ public class MemberController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('can_update_members')")
     public ResponseEntity<MemberResponse> updateMember(@PathVariable("id") Long id, @Valid @RequestBody MemberRequest request) {
         log.info("Updating member with id: {}", id);
         MemberResponse response = memberService.updateMember(id, request);
@@ -76,6 +83,7 @@ public class MemberController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('can_delete_members')")
     public ResponseEntity<Void> deleteMember(@PathVariable("id") Long id) {
         log.info("Deleting member with id: {}", id);
         memberService.deleteMember(id);
