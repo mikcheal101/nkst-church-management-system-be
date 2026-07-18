@@ -32,13 +32,18 @@ public class Member extends Auditable {
     @Builder.Default
     private Gender gender = Gender.MALE;
 
+    @Column(name = "middle_name")
     private String middleName;
 
-    @Column(unique = true)
+    @Column(unique = true, name = "email_address")
     private String emailAddress;
 
     @Builder.Default
     private boolean isBaptised = false;
+
+    @Builder.Default
+    @Column(name = "is_admin")
+    private boolean isAdmin = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "church_id", nullable = false)
@@ -52,4 +57,6 @@ public class Member extends Auditable {
     private Long userId;
 
     private String userType;
+
+    private String address;
 }

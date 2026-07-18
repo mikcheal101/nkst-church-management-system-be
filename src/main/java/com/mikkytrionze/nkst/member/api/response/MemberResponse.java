@@ -21,5 +21,7 @@ public class MemberResponse {
     private String emailAddress;
     private boolean isBaptised;
     private ChurchDTO church;
+    private boolean isAdmin;
+    private String address;
     private BaptismRecordDTO baptismRecord;
 }

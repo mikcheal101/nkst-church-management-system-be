@@ -35,15 +35,19 @@ public class MemberRequest {
     @NotNull(message = "Church ID is required!")
     private Long churchId;
 
+    private String address;
+
     @Builder.Default
     private Boolean isBaptised = false;
+
+    @Builder.Default
+    private Boolean isAdmin = false;
 
     private Integer serialNumber;
     private String worshipCenter;
     private String bibleVerse;
     private String baptisedBy;
     private String remark;
-    private String address;
     private String imageUri;
     private LocalDate dateOfBaptism;
 }

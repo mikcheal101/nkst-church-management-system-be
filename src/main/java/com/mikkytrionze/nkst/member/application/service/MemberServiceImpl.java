@@ -75,6 +75,7 @@ public class MemberServiceImpl implements MemberService {
                 .emailAddress(memberRequest.getEmailAddress())
                 .gender(Gender.valueOf(memberRequest.getGender().toUpperCase()))
                 .isBaptised(memberRequest.getIsBaptised())
+                .address(memberRequest.getAddress())
                 .church(church)
                 .build();
 
@@ -86,7 +87,6 @@ public class MemberServiceImpl implements MemberService {
                             .serialNumber(memberRequest.getSerialNumber())
                             .baptizedBy(memberRequest.getBaptisedBy())
                             .worshipCenter(memberRequest.getWorshipCenter())
-                            .address(memberRequest.getAddress())
                             .remark(memberRequest.getRemark())
                             .build();
             member.setBaptismRecord(baptismRecordService.save(baptismRecord));
@@ -121,6 +121,7 @@ public class MemberServiceImpl implements MemberService {
         savedMember.setEmailAddress(memberRequest.getEmailAddress());
         savedMember.setLastName(memberRequest.getLastName());
         savedMember.setMiddleName(memberRequest.getMiddleName());
+        savedMember.setAddress(memberRequest.getAddress());
 
         if (memberRequest.getChurchId() != null) {
             Church church = churchRepository.findById(memberRequest.getChurchId())
@@ -180,7 +181,6 @@ public class MemberServiceImpl implements MemberService {
         baptismRecord.setSerialNumber(memberRequest.getSerialNumber());
         baptismRecord.setBibleVerse(memberRequest.getBibleVerse());
         baptismRecord.setBaptizedBy(memberRequest.getBaptisedBy());
-        baptismRecord.setAddress(memberRequest.getAddress());
         baptismRecord.setRemark(memberRequest.getRemark());
         return baptismRecord;
     }

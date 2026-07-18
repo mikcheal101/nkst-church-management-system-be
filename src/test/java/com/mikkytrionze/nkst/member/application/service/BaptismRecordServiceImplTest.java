@@ -101,7 +101,6 @@ class BaptismRecordServiceImplTest {
                 .worshipCenter("New Church")
                 .bibleVerse("Matthew 28:19")
                 .baptizedBy("Pastor Jane")
-                .address("123 New St")
                 .remark("Updated record")
                 .imageUri("http://example.com/photo.jpg")
                 .build();
@@ -116,7 +115,6 @@ class BaptismRecordServiceImplTest {
         assertEquals("New Church", result.getWorshipCenter());
         assertEquals("Matthew 28:19", result.getBibleVerse());
         assertEquals("Pastor Jane", result.getBaptizedBy());
-        assertEquals("123 New St", result.getAddress());
         assertEquals("Updated record", result.getRemark());
         assertEquals("http://example.com/photo.jpg", result.getImageUri());
     }

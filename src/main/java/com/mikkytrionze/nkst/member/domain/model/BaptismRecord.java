@@ -27,7 +27,7 @@ public class BaptismRecord extends Auditable {
     private LocalDate dateOfBaptism;
 
     @Column(nullable = false)
-    private String worshipCenter; // the church name where the member was baptised at
+    private String worshipCenter; // the church name where the member was baptized at
 
     @Column(nullable = false)
     private String bibleVerse;
@@ -36,8 +36,6 @@ public class BaptismRecord extends Auditable {
     private String baptizedBy; // pastor who baptized the member.
 
     private String remark;
-
-    private String address;
 
     private String imageUri; // uri to passport photo.
 }

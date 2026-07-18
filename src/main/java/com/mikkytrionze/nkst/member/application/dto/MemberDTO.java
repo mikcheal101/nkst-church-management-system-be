@@ -17,6 +17,8 @@ public class MemberDTO {
     private String firstName;
     private String gender;
     private String emailAddress;
+    private String address;
+    private Boolean isAdmin;
 
     @Builder.Default
     private Boolean isBaptised = Boolean.FALSE;

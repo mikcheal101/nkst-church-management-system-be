@@ -15,7 +15,6 @@ class BaptismRecordMapperTest {
         LocalDate now = LocalDate.now();
         BaptismRecord baptismRecord = BaptismRecord.builder()
                 .id(1L)
-                .address("123 Main St")
                 .dateOfBaptism(now)
                 .baptizedBy("Pastor John")
                 .bibleVerse("John 3:16")
@@ -56,7 +55,6 @@ class BaptismRecordMapperTest {
         BaptismRecord entity = BaptismRecordMapper.toEntity(dto);
 
         assertNotNull(entity);
-        assertEquals("123 Main St", entity.getAddress());
         assertEquals(now, entity.getDateOfBaptism());
         assertEquals("Pastor John", entity.getBaptizedBy());
         assertEquals("John 3:16", entity.getBibleVerse());

@@ -46,7 +46,6 @@ public class BaptismRecordServiceImpl implements BaptismRecordService {
     public BaptismRecord update(Long id, BaptismRecord baptismRecord) {
         BaptismRecord savedRecord = findById(id);
 
-        savedRecord.setAddress(baptismRecord.getAddress());
         savedRecord.setRemark(baptismRecord.getRemark());
         savedRecord.setDateOfBaptism(baptismRecord.getDateOfBaptism());
         savedRecord.setBibleVerse(baptismRecord.getBibleVerse());

@@ -96,5 +96,38 @@
                              columnNames="member_id, church_id"
                              constraintName="uk_pastor_member_church" />
     </changeSet>
+    
+    <changeSet id="1784331135891" author="hemen.hirekaan">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="members" />
+        </preConditions>
+        
+        <addColumn tableName="members">
+            <column name="address" type="TEXT">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+    
+    <changeSet id="1784331141638" author="hemen.hirekaan">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="baptism_record" />
+            <columnExists tableName="baptism_record" columnName="address" />
+        </preConditions>
+
+        <dropColumn tableName="baptism_record" columnName="address" />
+    </changeSet>
+
+    <changeSet id="1784332997123" author="hemen.hirekaan">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="members" />
+        </preConditions>
+
+        <addColumn tableName="members">
+            <column name="is_admin" defaultValueBoolean="false" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>

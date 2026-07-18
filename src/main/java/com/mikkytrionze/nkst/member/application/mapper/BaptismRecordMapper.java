@@ -13,7 +13,6 @@ public class BaptismRecordMapper {
 
         return BaptismRecordDTO.builder()
                 .id(baptismRecord.getId())
-                .address(baptismRecord.getAddress())
                 .dateOfBaptism(baptismRecord.getDateOfBaptism())
                 .baptizedBy(baptismRecord.getBaptizedBy())
                 .bibleVerse(baptismRecord.getBibleVerse())
@@ -30,7 +29,6 @@ public class BaptismRecordMapper {
         }
 
         return BaptismRecord.builder()
-                .address(baptismRecordDTO.getAddress())
                 .dateOfBaptism(baptismRecordDTO.getDateOfBaptism())
                 .worshipCenter(baptismRecordDTO.getWorshipCenter())
                 .baptizedBy(baptismRecordDTO.getBaptizedBy())
