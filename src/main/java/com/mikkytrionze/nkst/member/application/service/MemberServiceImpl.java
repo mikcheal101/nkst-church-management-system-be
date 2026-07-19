@@ -14,15 +14,18 @@ import com.mikkytrionze.nkst.member.domain.repository.MemberRepository;
 import com.mikkytrionze.nkst.member.domain.service.BaptismRecordService;
 import com.mikkytrionze.nkst.member.domain.service.MemberService;
 import com.mikkytrionze.nkst.shared.exception.ResourceNotFoundException;
+import com.mikkytrionze.role.application.dto.UserUpdatedEvent;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -96,7 +99,7 @@ public class MemberServiceImpl implements MemberService {
 
         // publish member to kafka
         MemberCreatedEvent memberCreatedEvent = MemberCreatedEvent.builder()
-                .memberId(savedMember.getId())
+                .memberId(savedMember.getUserId())
                 .username(savedMember.getTel().trim().isBlank() ?
                         savedMember.getEmailAddress().trim().toLowerCase() : savedMember.getTel().trim())
                 .password(null)
@@ -173,6 +176,37 @@ public class MemberServiceImpl implements MemberService {
         Page<Member> churchAdmins = this.memberRepository.findAllByChurchIdAndUserTypeChurchAdmin(churchId, pageable);
 
         return churchAdmins.map(MemberMapper::toResponse);
+    }
+
+    @Override
+    public void processUserUpdatedEvent(UserUpdatedEvent userUpdatedEvent) {
+        log.info("Updating the member based on user event");
+
+        // 1. Fetch the member
+        String exception = String.format("Member with id: %s not found!", userUpdatedEvent.getMemberId());
+        Member member = this.memberRepository
+                .findById(userUpdatedEvent.getMemberId())
+                .orElseThrow(() -> new ResourceNotFoundException(exception));
+
+        // 2. Update the member
+        member.setUserId(userUpdatedEvent.getUserId());
+        this.memberRepository.saveAndFlush(member);
+    }
+
+    @Override
+    public Page<MemberResponse> searchMembers(String query, Pageable pageable) {
+        // 1. Fetch the user identifier
+        String identifier = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        log.info("Searching for members with query: {} for user: {}", query, identifier);
+
+        // 2. Fetch the churchId once (This will be cached if you use Spring Cache)
+        Long churchId = memberRepository.findChurchIdByIdentifier(identifier)
+                .orElseThrow(() -> new ResourceNotFoundException("User church not found"));
+
+        // 3. Perform a simple search
+        return memberRepository.findByChurchIdAndName(churchId, query, pageable)
+                .map(MemberMapper::toResponse);
     }
 
     private static @NonNull BaptismRecord getBaptismRecord(MemberRequest memberRequest, BaptismRecord baptismRecord) {

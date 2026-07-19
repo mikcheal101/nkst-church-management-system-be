@@ -3,6 +3,7 @@ package com.mikkytrionze.nkst.member.domain.service;
 import com.mikkytrionze.nkst.member.api.request.MemberRequest;
 import com.mikkytrionze.nkst.member.api.response.MemberResponse;
 import com.mikkytrionze.nkst.member.domain.model.Member;
+import com.mikkytrionze.role.application.dto.UserUpdatedEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -84,4 +85,23 @@ public interface MemberService {
      * @return The {@link Page} of {@link MemberResponse}.
      */
     Page<MemberResponse> fetchProspectiveAdmins(final Long churchId, Pageable pageable);
+
+    /**
+     * Processes an event triggered when a user's information has been updated
+     * in the identity or authentication system, ensuring the local member record
+     * is synchronized with these changes.
+     *
+     * @param userUpdatedEvent the event object containing the updated user information
+     */
+    void processUserUpdatedEvent(UserUpdatedEvent userUpdatedEvent);
+
+    /**
+     * Searches for members based on a provided query string (e.g., name or contact details)
+     * and returns a paginated list of matching records.
+     *
+     * @param query    the search term to match against member attributes
+     * @param pageable pagination and sorting information
+     * @return a {@link Page} of {@link MemberResponse} objects matching the search criteria
+     */
+    Page<MemberResponse> searchMembers(String query, Pageable pageable);
 }

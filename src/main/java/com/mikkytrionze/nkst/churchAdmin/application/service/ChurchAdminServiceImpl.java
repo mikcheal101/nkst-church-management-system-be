@@ -1,7 +1,9 @@
 package com.mikkytrionze.nkst.churchAdmin.application.service;
 
+import com.mikkytrionze.churchAdmin.application.dto.ChurchAdminUpdatedEvent;
 import com.mikkytrionze.nkst.church.domain.model.Church;
 import com.mikkytrionze.nkst.church.domain.repository.ChurchRepository;
+import com.mikkytrionze.nkst.churchAdmin.domain.gateway.ChurchAdminEventPublisher;
 import com.mikkytrionze.nkst.churchAdmin.domain.service.ChurchAdminService;
 import com.mikkytrionze.nkst.member.domain.model.Member;
 import com.mikkytrionze.nkst.member.domain.repository.MemberRepository;
@@ -20,6 +22,7 @@ public class ChurchAdminServiceImpl implements ChurchAdminService {
 
     private final MemberRepository memberRepository;
     private final ChurchRepository churchRepository;
+    private final ChurchAdminEventPublisher churchAdminEventPublisher;
 
     @Override
     public Boolean setChurchAdmin(Long memberId) throws ResourceNotFoundException {
@@ -30,7 +33,7 @@ public class ChurchAdminServiceImpl implements ChurchAdminService {
                 .findById(memberId)
                 .orElseThrow(() -> new ResourceNotFoundException(exception));
 
-        // 2. Ensure that the church has no other admin.
+        // 2.a. Ensure that the church has no other admin.
         Long churchId = newAdmin.getChurch().getId();
         this.memberRepository
                 .findByChurchIdAndIsAdminTrue(churchId)
@@ -38,6 +41,13 @@ public class ChurchAdminServiceImpl implements ChurchAdminService {
                     log.info("Downgrading existing admin: {}", existingAdmin.getId());
                     existingAdmin.setAdmin(Boolean.FALSE);
                     this.memberRepository.save(existingAdmin);
+
+                    // 2.b. Publish to user service the drop in user role.
+                    churchAdminEventPublisher.publishChurchAdminUpdated(ChurchAdminUpdatedEvent.builder()
+                            .activate(false)
+                            .churchId(churchId)
+                            .memberId(existingAdmin.getUserId())
+                            .build());
                 });
 
         // 3. Upgrade the new member.
@@ -45,6 +55,12 @@ public class ChurchAdminServiceImpl implements ChurchAdminService {
         newAdmin.setAdmin(Boolean.TRUE);
         this.memberRepository.save(newAdmin);
 
+        // 4. Publish to user service the change in user role.
+        churchAdminEventPublisher.publishChurchAdminUpdated(ChurchAdminUpdatedEvent.builder()
+                .activate(true)
+                .memberId(newAdmin.getUserId())
+                .churchId(churchId)
+                .build());
         return true;
     }
 

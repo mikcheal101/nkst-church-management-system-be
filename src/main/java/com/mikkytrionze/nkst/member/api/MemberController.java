@@ -89,4 +89,17 @@ public class MemberController {
         memberService.deleteMember(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/search")
+    @PreAuthorize("hasAuthority('can_view_members')")
+    public ResponseEntity<Page<MemberResponse>> search(
+            @RequestParam(value = "query") String query,
+            @PageableDefault(size = Constants.PAGE_SIZE) Pageable pageable) {
+
+        log.info("Searching for members with query: {}", query);
+
+        Page<MemberResponse> results = memberService.searchMembers(query, pageable);
+
+        return ResponseEntity.ok(results);
+    }
 }

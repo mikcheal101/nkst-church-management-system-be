@@ -23,7 +23,7 @@ public class ChurchAdminController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('can_view_church', 'can_read_church')")
+    @PreAuthorize("hasAuthority('can_view_church') and hasAuthority('can_read_church')")
     public ResponseEntity<Boolean> churchHasAdmin(@PathVariable Long id) {
         boolean hasAdmin = this.churchAdminService.churchHasAdmin(id);
         return ResponseEntity.ok().body(hasAdmin);

@@ -5,6 +5,7 @@ import com.mikkytrionze.nkst.church.api.response.ChurchResponse;
 import com.mikkytrionze.nkst.church.domain.model.Church;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import com.mikkytrionze.nkst.shared.exception.ResourceNotFoundException;
 
 /**
  * Service interface for Church domain operations.
