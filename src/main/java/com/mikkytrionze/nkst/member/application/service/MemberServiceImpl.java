@@ -14,6 +14,7 @@ import com.mikkytrionze.nkst.member.domain.repository.MemberRepository;
 import com.mikkytrionze.nkst.member.domain.service.BaptismRecordService;
 import com.mikkytrionze.nkst.member.domain.service.MemberService;
 import com.mikkytrionze.nkst.shared.exception.ResourceNotFoundException;
+import com.mikkytrionze.role.application.dto.ERole;
 import com.mikkytrionze.role.application.dto.UserUpdatedEvent;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -40,9 +40,9 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberResponse getById(Long id) {
         log.info("Getting Member by Id: {}", id);
-        
+
         Member member = findById(id, null);
-        
+
         return MemberMapper.toResponse(member);
     }
 
@@ -85,13 +85,13 @@ public class MemberServiceImpl implements MemberService {
         BaptismRecord baptismRecord = null;
         if (Boolean.TRUE.equals(memberRequest.getIsBaptised())) {
             baptismRecord = BaptismRecord.builder()
-                            .dateOfBaptism(memberRequest.getDateOfBaptism())
-                            .bibleVerse(memberRequest.getBibleVerse())
-                            .serialNumber(memberRequest.getSerialNumber())
-                            .baptizedBy(memberRequest.getBaptisedBy())
-                            .worshipCenter(memberRequest.getWorshipCenter())
-                            .remark(memberRequest.getRemark())
-                            .build();
+                    .dateOfBaptism(memberRequest.getDateOfBaptism())
+                    .bibleVerse(memberRequest.getBibleVerse())
+                    .serialNumber(memberRequest.getSerialNumber())
+                    .baptizedBy(memberRequest.getBaptisedBy())
+                    .worshipCenter(memberRequest.getWorshipCenter())
+                    .remark(memberRequest.getRemark())
+                    .build();
             member.setBaptismRecord(baptismRecordService.save(baptismRecord));
         }
 
@@ -99,11 +99,14 @@ public class MemberServiceImpl implements MemberService {
 
         // publish member to kafka
         MemberCreatedEvent memberCreatedEvent = MemberCreatedEvent.builder()
-                .memberId(savedMember.getUserId())
-                .username(savedMember.getTel().trim().isBlank() ?
-                        savedMember.getEmailAddress().trim().toLowerCase() : savedMember.getTel().trim())
+                .memberId(savedMember.getId())
+                .username(savedMember.getTel().trim().isBlank() ? savedMember.getEmailAddress().trim().toLowerCase()
+                        : savedMember.getTel().trim())
                 .password(null)
-                .roles(List.of(Boolean.TRUE.equals(memberRequest.getIsBaptised()) ? "MEMBER_BAPTISED" : "MEMBER_UNBAPTISED"))
+                .roles(List.of(
+                        Boolean.TRUE.equals(
+                                memberRequest.getIsBaptised()) ? ERole.MEMBER_BAPTISED.name()
+                                        : ERole.MEMBER_UNBAPTISED.name()))
                 .build();
         memberEventPublisher.publishMemberCreated(memberCreatedEvent);
 
@@ -136,9 +139,9 @@ public class MemberServiceImpl implements MemberService {
             BaptismRecord baptismRecord = getBaptismRecord(memberRequest, savedMember.getBaptismRecord());
             savedMember.setBaptismRecord(baptismRecordService.update(baptismRecord.getId(), baptismRecord));
         }
-        
+
         Member updatedMember = memberRepository.save(savedMember);
-        
+
         return MemberMapper.toResponse(updatedMember);
     }
 
@@ -224,7 +227,7 @@ public class MemberServiceImpl implements MemberService {
             throw new IllegalArgumentException("Id is required!");
         }
 
-        Member member = memberRepository.findById(id).orElseThrow(() ->  new ResourceNotFoundException("Member", id));
+        Member member = memberRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Member", id));
 
         if (churchId != null && churchId > 0 && !churchId.equals(member.getChurch().getId())) {
             throw new ResourceNotFoundException("Member", id);
