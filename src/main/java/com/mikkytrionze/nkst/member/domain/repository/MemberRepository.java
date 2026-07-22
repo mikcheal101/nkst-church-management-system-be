@@ -29,15 +29,13 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Long> findChurchIdByIdentifier(@Param("identifier") String identifier);
 
 
-    @Query("""
-        SELECT m FROM Member m WHERE m.church.id = :churchId AND 
-        (
-            LOWER(m.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR 
-            LOWER(m.lastName) LIKE LOWER(CONCAT('%', :query, '%')) OR
-            LOWER(m.middleName) LIKE LOWER(CONCAT('%', :query, '%')) OR
-            LOWER(m.tel) LIKE LOWER(CONCAT('%', :query, '%'))
-        )
-        """)
+    @Query("SELECT m FROM Member m WHERE m.church.id = :churchId AND " +
+        "(" +
+            "LOWER(m.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(m.lastName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(m.middleName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(m.tel) LIKE LOWER(CONCAT('%', :query, '%'))" +
+        ")")
     Page<Member> findByChurchIdAndName(@Param("churchId") Long churchId,
                                        @Param("query") String query,
                                        Pageable pageable);

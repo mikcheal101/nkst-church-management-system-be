@@ -1,14 +1,12 @@
 package com.mikkytrionze.nkst.churchAdmin.application.service;
 
 import com.mikkytrionze.churchAdmin.application.dto.ChurchAdminUpdatedEvent;
-import com.mikkytrionze.nkst.church.domain.model.Church;
 import com.mikkytrionze.nkst.church.domain.repository.ChurchRepository;
 import com.mikkytrionze.nkst.churchAdmin.domain.gateway.ChurchAdminEventPublisher;
 import com.mikkytrionze.nkst.churchAdmin.domain.service.ChurchAdminService;
 import com.mikkytrionze.nkst.member.domain.model.Member;
 import com.mikkytrionze.nkst.member.domain.repository.MemberRepository;
 import com.mikkytrionze.nkst.shared.exception.ResourceNotFoundException;
-import com.mikkytrionze.role.application.dto.ERole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
