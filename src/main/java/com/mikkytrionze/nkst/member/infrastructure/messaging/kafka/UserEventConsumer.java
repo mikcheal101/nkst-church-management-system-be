@@ -16,7 +16,8 @@ public class UserEventConsumer {
 
     @KafkaListener(topics = "${spring.kafka.topic.user-updated}", groupId = "${spring.kafka.consumer-group-id}")
     public void consumeUserUpdatedEvent(UserUpdatedEvent userUpdatedEvent) {
-        log.info("Received user updated event: {}", userUpdatedEvent);
+        log.info("Received user updated event, userId: {}, memberId: {}",
+                userUpdatedEvent.getUserId(), userUpdatedEvent.getMemberId());
 
         memberService.processUserUpdatedEvent(userUpdatedEvent);
     }
