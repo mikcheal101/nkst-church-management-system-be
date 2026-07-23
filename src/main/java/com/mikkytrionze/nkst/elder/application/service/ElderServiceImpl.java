@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -59,6 +60,7 @@ public class ElderServiceImpl implements ElderService {
     }
 
     @Override
+    @Transactional
     public Boolean makeElder(MakeElderRequest makeElderRequest) {
         log.info("Promoting member {} to elder", makeElderRequest.getMemberId());
 
