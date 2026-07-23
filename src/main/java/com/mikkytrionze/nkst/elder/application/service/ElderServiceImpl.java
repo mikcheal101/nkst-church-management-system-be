@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -59,6 +60,7 @@ public class ElderServiceImpl implements ElderService {
     }
 
     @Override
+    @Transactional
     public Boolean makeElder(MakeElderRequest makeElderRequest) {
         log.info("Promoting member {} to elder", makeElderRequest.getMemberId());
 
@@ -91,6 +93,20 @@ public class ElderServiceImpl implements ElderService {
         log.info("Member {} successfully promoted to elder", member.getId());
         return true;
 
+    }
+
+    @Override
+    public Page<MemberResponse> searchEligibleMembersForElder(String query, Pageable pageable) throws ResourceNotFoundException {
+        // 1. Get the user's Church using the existing helper method
+        Church church = getUsersChurch();
+
+        log.info("Searching eligible members for elder in church: {} with query: '{}'", church.getId(), query);
+
+        // 2. Perform search at the database level with pagination (handles the query filter)
+        Page<Member> churchMembers = memberRepository.searchEligibleMembersForElder(church.getId(), query, pageable);
+
+        // 3. Map to DTO response
+        return churchMembers.map(MemberMapper::toResponse);
     }
 
     private Church getUsersChurch() throws ResourceNotFoundException {

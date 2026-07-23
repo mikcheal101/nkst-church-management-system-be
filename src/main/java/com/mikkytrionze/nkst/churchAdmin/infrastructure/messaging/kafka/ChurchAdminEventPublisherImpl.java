@@ -24,6 +24,11 @@ public class ChurchAdminEventPublisherImpl implements ChurchAdminEventPublisher 
         log.info("Infrastructure: Publishing ChurchAdminUpdatedEvent to kafka. Member ID: {}",
                 churchAdminUpdatedEvent.getMemberId());
 
+        if (churchAdminUpdatedEvent.getMemberId() == null) {
+            log.warn("Infrastructure: Skipping publish — memberId is null");
+            return;
+        }
+
         try {
             kafkaTemplate.send(churchAdminUpdatedEventTopic,
                     churchAdminUpdatedEvent.getMemberId().toString(), churchAdminUpdatedEvent);
