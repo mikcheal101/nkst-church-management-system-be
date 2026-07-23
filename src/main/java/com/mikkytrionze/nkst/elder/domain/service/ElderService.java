@@ -39,4 +39,14 @@ public interface ElderService {
      * @return {@code true} if the member was successfully promoted, {@code false} otherwise
      */
     Boolean makeElder(MakeElderRequest makeElderRequest);
+
+    /**
+     * Searches for regular members who are eligible to be promoted or considered
+     * for the elder position, using a search query and pagination.
+     *
+     * @param query    the search string to filter members by name, email, or other criteria
+     * @param pageable the pagination and sorting information
+     * @return a {@link Page} of {@link MemberResponse} objects representing the matching eligible candidates
+     */
+    Page<MemberResponse> searchEligibleMembersForElder(String query, Pageable pageable);
 }

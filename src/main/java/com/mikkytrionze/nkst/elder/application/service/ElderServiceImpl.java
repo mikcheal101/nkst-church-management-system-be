@@ -93,6 +93,20 @@ public class ElderServiceImpl implements ElderService {
 
     }
 
+    @Override
+    public Page<MemberResponse> searchEligibleMembersForElder(String query, Pageable pageable) throws ResourceNotFoundException {
+        // 1. Get the user's Church using the existing helper method
+        Church church = getUsersChurch();
+
+        log.info("Searching eligible members for elder in church: {} with query: '{}'", church.getId(), query);
+
+        // 2. Perform search at the database level with pagination (handles the query filter)
+        Page<Member> churchMembers = memberRepository.searchEligibleMembersForElder(church.getId(), query, pageable);
+
+        // 3. Map to DTO response
+        return churchMembers.map(MemberMapper::toResponse);
+    }
+
     private Church getUsersChurch() throws ResourceNotFoundException {
         String identifier = SecurityContextHolder.getContext().getAuthentication().getName();
 

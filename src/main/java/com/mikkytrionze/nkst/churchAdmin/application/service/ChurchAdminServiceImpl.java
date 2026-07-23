@@ -41,11 +41,13 @@ public class ChurchAdminServiceImpl implements ChurchAdminService {
                     this.memberRepository.save(existingAdmin);
 
                     // 2.b. Publish to user service the drop in user role.
-                    churchAdminEventPublisher.publishChurchAdminUpdated(ChurchAdminUpdatedEvent.builder()
-                            .activate(false)
-                            .churchId(churchId)
-                            .memberId(existingAdmin.getUserId())
-                            .build());
+                    if (existingAdmin.getUserId() != null) {
+                        churchAdminEventPublisher.publishChurchAdminUpdated(ChurchAdminUpdatedEvent.builder()
+                                .activate(false)
+                                .churchId(churchId)
+                                .memberId(existingAdmin.getUserId())
+                                .build());
+                    }
                 });
 
         // 3. Upgrade the new member.
@@ -54,11 +56,13 @@ public class ChurchAdminServiceImpl implements ChurchAdminService {
         this.memberRepository.save(newAdmin);
 
         // 4. Publish to user service the change in user role.
-        churchAdminEventPublisher.publishChurchAdminUpdated(ChurchAdminUpdatedEvent.builder()
-                .activate(true)
-                .memberId(newAdmin.getUserId())
-                .churchId(churchId)
-                .build());
+        if (newAdmin.getUserId() != null) {
+            churchAdminEventPublisher.publishChurchAdminUpdated(ChurchAdminUpdatedEvent.builder()
+                    .activate(true)
+                    .memberId(newAdmin.getUserId())
+                    .churchId(churchId)
+                    .build());
+        }
         return true;
     }
 
